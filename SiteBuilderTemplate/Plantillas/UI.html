@@ -1,0 +1,31 @@
+﻿@model List<@@Modelo>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_@@Layout.cshtml";
+}
+
+<h2>@@Nombre</h2>
+
+<h1 class="block">Administración de @@Nombre</h1>
+<div class="column1-unit">
+    <table>
+        <tr>
+            @@Encabezado            
+            <th class="top" scope="col"></th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                @@Cuerpo                
+                <td>@Html.ActionLink("Edit", "Edit", new { id=item.@@Clave })</td>
+            </tr>
+        }
+    </table>
+    
+</div>
+<hr class="clear-contentunit" />
+
+<div>
+    @Html.ActionLink("Crear Página", "Create")
+</div>
