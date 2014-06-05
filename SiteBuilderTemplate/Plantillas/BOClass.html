@@ -1,0 +1,40 @@
+﻿using @@Namespace.@@NombreDatos;
+using @@Namespace.@@NombreModelo;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace @@Namespace.@@NombreNegocio
+{
+    public static class @@ClaseNegocio
+    {
+        public static List<@@Modelo> GetAll()
+        {
+            return @@ClaseDatos.GetAll();
+        }
+
+        public static @@Modelo Get(int id)
+        {
+            return @@ClaseDatos.Get(id);
+        }
+
+        public static void Update(@@Modelo @@NombreClase)
+        {
+            if (page.ID > 0)
+            {
+                @@ClaseDatos.Update(@@NombreClase);
+            }
+            else
+            {
+                throw new Exception("Page not found");
+            }
+            
+        }
+
+        public static void Create(@@Modelo @@NombreClase)
+        {
+            @@ClaseDatos.Create(@@NombreClase);
+        }
+    }
+}

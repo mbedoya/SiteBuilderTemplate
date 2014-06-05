@@ -1,0 +1,85 @@
+﻿using @@Namespace.@@NombreModelo;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using System.Configuration;
+
+using MySql.Data.MySqlClient;
+
+namespace @@Namespace.@@NombreDatos
+{
+    public class @@ClaseDatos
+    {
+        public static List<@@Modelo> GetAll()
+        {
+            List<@@Modelo> @@NombreClases = new List<@@Modelo>();
+
+            MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
+            MySqlDataAdapter adapter = new MySqlDataAdapter(BusinessUtilies.Const.Database.Procedure_GetAllPages, connection);
+            DataTable results = new DataTable();
+
+            adapter.Fill(results);
+
+            foreach (DataRow item in results.Rows)
+            {
+                @@Modelo @@NombreClase = new @@Modelo();                
+                @@CuerpoMapeo
+
+                @@NombreClases.Add(@@NombreClase);                 
+            }            
+
+            return @@NombreClases;
+        }
+
+        public static @@Modelo Get(int id)
+        {
+            @@Modelo @@NombreClase = null;
+
+            MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
+            MySqlDataAdapter adapter = new MySqlDataAdapter(BusinessUtilies.Const.Database.Procedure_GetPage, connection);
+            MySqlParameter paramID = new MySqlParameter("pId", id);
+            paramID.Direction = ParameterDirection.Input;
+            adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
+            adapter.SelectCommand.Parameters.Add(paramID);
+
+            DataTable results = new DataTable();
+
+            adapter.Fill(results);
+
+            if(results.Rows.Count > 0)
+            {
+                DataRow item = results.Rows[0];
+                @@NombreClase = new @@Modelo();                
+                @@CuerpoMapeo                
+            }
+
+            return @@NombreClase;
+        }
+
+        public static void Update(@@Modelo @@NombreClase)
+        {
+            MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
+            MySqlDataAdapter adapter = new MySqlDataAdapter(BusinessUtilies.Const.Database.Procedure_UpdatePage, connection);
+            adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
+
+            @@SetData
+
+            DataTable results = new DataTable();
+            adapter.Fill(results);
+        }
+
+        public static void Create(@@Modelo @@NombreClase)
+        {
+            MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
+            MySqlDataAdapter adapter = new MySqlDataAdapter(BusinessUtilies.Const.Database.Procedure_CreatePage, connection);                        
+            adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
+
+            @@SetData
+
+            DataTable results = new DataTable();
+            adapter.Fill(results);
+        }
+    }
+}

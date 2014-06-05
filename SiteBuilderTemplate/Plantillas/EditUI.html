@@ -1,0 +1,32 @@
+﻿@using System.Web.Optimization
+
+@model @@Modelo
+
+@{
+    ViewBag.Title = "@@Nombre Edit";
+    Layout = "~/Views/Shared/_@@Layout.cshtml";
+}
+
+<h2>Edición de @@Nombre</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>@@Nombre</legend>
+
+        @@Cuerpo
+
+        @Html.HiddenFor(model => model.@@Clave)
+
+        <p>
+            <input type="submit" value="Save" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@@Scripts

@@ -1,0 +1,30 @@
+﻿@using System.Web.Optimization
+
+@model @@Modelo
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_@@Layout.cshtml";
+}
+
+<h2>Crear @@Nombre</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>@@Nombre</legend>
+
+        @@Cuerpo
+
+        <p>
+            <input type="submit" value="Save" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@@Scripts

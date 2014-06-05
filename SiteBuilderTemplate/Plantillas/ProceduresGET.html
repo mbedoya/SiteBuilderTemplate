@@ -1,0 +1,34 @@
+﻿USE @@NombreClase;
+
+DROP procedure IF EXISTS `Get@@Clases`;
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Get@@Clases`()
+BEGIN
+	SELECT
+		@@Campos
+	FROM 
+        @@NombreClase;
+END$$
+
+
+DROP procedure IF EXISTS `Get@@ClaseByID`;
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Get@@ClaseByID`(IN p@@Clave @@TipoDatoClave)
+BEGIN
+
+	SELECT
+		@@Campos
+	FROM 
+        @@NombreClase
+	WHERE
+		ID = p@@Clave;
+
+END$$
