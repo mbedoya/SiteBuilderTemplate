@@ -30,6 +30,18 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.txtNombreBD = new System.Windows.Forms.TextBox();
+            this.label17 = new System.Windows.Forms.Label();
+            this.txtNombreDatos = new System.Windows.Forms.TextBox();
+            this.label16 = new System.Windows.Forms.Label();
+            this.txtPrefijoDatos = new System.Windows.Forms.TextBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.txtPrefijoNegocio = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.txtNombreNegocio = new System.Windows.Forms.TextBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.txtNombreModelo = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
             this.txtLayout = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.txtPrefijoModelo = new System.Windows.Forms.TextBox();
@@ -47,6 +59,8 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.txtCarTextArea = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
             this.txtMaximoCaracteresTabla = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.txtPropiedad = new System.Windows.Forms.TextBox();
@@ -55,18 +69,8 @@
             this.label7 = new System.Windows.Forms.Label();
             this.txtCssEncabezado = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
-            this.txtCarTextArea = new System.Windows.Forms.TextBox();
-            this.label11 = new System.Windows.Forms.Label();
-            this.txtNombreModelo = new System.Windows.Forms.TextBox();
-            this.label12 = new System.Windows.Forms.Label();
-            this.txtNombreNegocio = new System.Windows.Forms.TextBox();
-            this.label13 = new System.Windows.Forms.Label();
-            this.txtPrefijoNegocio = new System.Windows.Forms.TextBox();
-            this.label14 = new System.Windows.Forms.Label();
-            this.txtPrefijoDatos = new System.Windows.Forms.TextBox();
-            this.label15 = new System.Windows.Forms.Label();
-            this.txtNombreDatos = new System.Windows.Forms.TextBox();
-            this.label16 = new System.Windows.Forms.Label();
+            this.txtRutaExportar = new System.Windows.Forms.TextBox();
+            this.label18 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -85,6 +89,10 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.txtRutaExportar);
+            this.groupBox1.Controls.Add(this.label18);
+            this.groupBox1.Controls.Add(this.txtNombreBD);
+            this.groupBox1.Controls.Add(this.label17);
             this.groupBox1.Controls.Add(this.txtNombreDatos);
             this.groupBox1.Controls.Add(this.label16);
             this.groupBox1.Controls.Add(this.txtPrefijoDatos);
@@ -110,10 +118,112 @@
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(6, 20);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(564, 288);
+            this.groupBox1.Size = new System.Drawing.Size(564, 311);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Opciones";
+            // 
+            // txtNombreBD
+            // 
+            this.txtNombreBD.Location = new System.Drawing.Point(361, 238);
+            this.txtNombreBD.Name = "txtNombreBD";
+            this.txtNombreBD.Size = new System.Drawing.Size(182, 20);
+            this.txtNombreBD.TabIndex = 24;
+            this.txtNombreBD.Text = "felicis";
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(288, 241);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(65, 13);
+            this.label17.TabIndex = 23;
+            this.label17.Text = "Nombre BD:";
+            // 
+            // txtNombreDatos
+            // 
+            this.txtNombreDatos.Location = new System.Drawing.Point(89, 238);
+            this.txtNombreDatos.Name = "txtNombreDatos";
+            this.txtNombreDatos.Size = new System.Drawing.Size(182, 20);
+            this.txtNombreDatos.TabIndex = 22;
+            this.txtNombreDatos.Text = "Data";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(16, 241);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(38, 13);
+            this.label16.TabIndex = 21;
+            this.label16.Text = "Datos:";
+            // 
+            // txtPrefijoDatos
+            // 
+            this.txtPrefijoDatos.Location = new System.Drawing.Point(361, 197);
+            this.txtPrefijoDatos.Name = "txtPrefijoDatos";
+            this.txtPrefijoDatos.Size = new System.Drawing.Size(182, 20);
+            this.txtPrefijoDatos.TabIndex = 20;
+            this.txtPrefijoDatos.Text = "DAL";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(288, 200);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(60, 13);
+            this.label15.TabIndex = 19;
+            this.label15.Text = "Pref Datos:";
+            // 
+            // txtPrefijoNegocio
+            // 
+            this.txtPrefijoNegocio.Location = new System.Drawing.Point(89, 197);
+            this.txtPrefijoNegocio.Name = "txtPrefijoNegocio";
+            this.txtPrefijoNegocio.Size = new System.Drawing.Size(182, 20);
+            this.txtPrefijoNegocio.TabIndex = 18;
+            this.txtPrefijoNegocio.Text = "BO";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(16, 200);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(72, 13);
+            this.label14.TabIndex = 17;
+            this.label14.Text = "Pref Negocio:";
+            // 
+            // txtNombreNegocio
+            // 
+            this.txtNombreNegocio.Location = new System.Drawing.Point(89, 152);
+            this.txtNombreNegocio.Name = "txtNombreNegocio";
+            this.txtNombreNegocio.Size = new System.Drawing.Size(182, 20);
+            this.txtNombreNegocio.TabIndex = 16;
+            this.txtNombreNegocio.Text = "Business";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(16, 155);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(50, 13);
+            this.label13.TabIndex = 15;
+            this.label13.Text = "Negocio:";
+            // 
+            // txtNombreModelo
+            // 
+            this.txtNombreModelo.Location = new System.Drawing.Point(361, 115);
+            this.txtNombreModelo.Name = "txtNombreModelo";
+            this.txtNombreModelo.Size = new System.Drawing.Size(182, 20);
+            this.txtNombreModelo.TabIndex = 14;
+            this.txtNombreModelo.Text = "Models";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(288, 118);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(45, 13);
+            this.label12.TabIndex = 13;
+            this.label12.Text = "Modelo:";
             // 
             // txtLayout
             // 
@@ -203,7 +313,7 @@
             // 
             // btnGenerar
             // 
-            this.btnGenerar.Location = new System.Drawing.Point(468, 259);
+            this.btnGenerar.Location = new System.Drawing.Point(468, 282);
             this.btnGenerar.Name = "btnGenerar";
             this.btnGenerar.Size = new System.Drawing.Size(75, 23);
             this.btnGenerar.TabIndex = 2;
@@ -222,7 +332,7 @@
             // 
             // txtCodigo
             // 
-            this.txtCodigo.Location = new System.Drawing.Point(12, 358);
+            this.txtCodigo.Location = new System.Drawing.Point(12, 381);
             this.txtCodigo.Multiline = true;
             this.txtCodigo.Name = "txtCodigo";
             this.txtCodigo.ScrollBars = System.Windows.Forms.ScrollBars.Both;
@@ -236,7 +346,7 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(603, 340);
+            this.tabControl1.Size = new System.Drawing.Size(603, 363);
             this.tabControl1.TabIndex = 3;
             // 
             // tabPage1
@@ -245,7 +355,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(595, 314);
+            this.tabPage1.Size = new System.Drawing.Size(595, 337);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Básicas";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -256,7 +366,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(595, 212);
+            this.tabPage2.Size = new System.Drawing.Size(595, 337);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Varios";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -279,6 +389,23 @@
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Opciones";
+            // 
+            // txtCarTextArea
+            // 
+            this.txtCarTextArea.Location = new System.Drawing.Point(385, 66);
+            this.txtCarTextArea.Name = "txtCarTextArea";
+            this.txtCarTextArea.Size = new System.Drawing.Size(161, 20);
+            this.txtCarTextArea.TabIndex = 14;
+            this.txtCarTextArea.Text = "150";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(300, 69);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(75, 13);
+            this.label11.TabIndex = 13;
+            this.label11.Text = "Car Text Area:";
             // 
             // txtMaximoCaracteresTabla
             // 
@@ -348,107 +475,22 @@
             this.label10.TabIndex = 5;
             this.label10.Text = "CSS Encabezado:";
             // 
-            // txtCarTextArea
+            // txtRutaExportar
             // 
-            this.txtCarTextArea.Location = new System.Drawing.Point(385, 66);
-            this.txtCarTextArea.Name = "txtCarTextArea";
-            this.txtCarTextArea.Size = new System.Drawing.Size(161, 20);
-            this.txtCarTextArea.TabIndex = 14;
-            this.txtCarTextArea.Text = "150";
+            this.txtRutaExportar.Location = new System.Drawing.Point(89, 282);
+            this.txtRutaExportar.Name = "txtRutaExportar";
+            this.txtRutaExportar.Size = new System.Drawing.Size(182, 20);
+            this.txtRutaExportar.TabIndex = 26;
+            this.txtRutaExportar.Text = "C:\\Plantillas";
             // 
-            // label11
+            // label18
             // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(300, 69);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(75, 13);
-            this.label11.TabIndex = 13;
-            this.label11.Text = "Car Text Area:";
-            // 
-            // txtNombreModelo
-            // 
-            this.txtNombreModelo.Location = new System.Drawing.Point(361, 115);
-            this.txtNombreModelo.Name = "txtNombreModelo";
-            this.txtNombreModelo.Size = new System.Drawing.Size(182, 20);
-            this.txtNombreModelo.TabIndex = 14;
-            this.txtNombreModelo.Text = "Models";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(288, 118);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(45, 13);
-            this.label12.TabIndex = 13;
-            this.label12.Text = "Modelo:";
-            // 
-            // txtNombreNegocio
-            // 
-            this.txtNombreNegocio.Location = new System.Drawing.Point(89, 152);
-            this.txtNombreNegocio.Name = "txtNombreNegocio";
-            this.txtNombreNegocio.Size = new System.Drawing.Size(182, 20);
-            this.txtNombreNegocio.TabIndex = 16;
-            this.txtNombreNegocio.Text = "Business";
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(16, 155);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(50, 13);
-            this.label13.TabIndex = 15;
-            this.label13.Text = "Negocio:";
-            // 
-            // txtPrefijoNegocio
-            // 
-            this.txtPrefijoNegocio.Location = new System.Drawing.Point(89, 197);
-            this.txtPrefijoNegocio.Name = "txtPrefijoNegocio";
-            this.txtPrefijoNegocio.Size = new System.Drawing.Size(182, 20);
-            this.txtPrefijoNegocio.TabIndex = 18;
-            this.txtPrefijoNegocio.Text = "BO";
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(16, 200);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(72, 13);
-            this.label14.TabIndex = 17;
-            this.label14.Text = "Pref Negocio:";
-            // 
-            // txtPrefijoDatos
-            // 
-            this.txtPrefijoDatos.Location = new System.Drawing.Point(361, 197);
-            this.txtPrefijoDatos.Name = "txtPrefijoDatos";
-            this.txtPrefijoDatos.Size = new System.Drawing.Size(182, 20);
-            this.txtPrefijoDatos.TabIndex = 20;
-            this.txtPrefijoDatos.Text = "DAL";
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(288, 200);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(60, 13);
-            this.label15.TabIndex = 19;
-            this.label15.Text = "Pref Datos:";
-            // 
-            // txtNombreDatos
-            // 
-            this.txtNombreDatos.Location = new System.Drawing.Point(89, 238);
-            this.txtNombreDatos.Name = "txtNombreDatos";
-            this.txtNombreDatos.Size = new System.Drawing.Size(182, 20);
-            this.txtNombreDatos.TabIndex = 22;
-            this.txtNombreDatos.Text = "Data";
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(16, 241);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(38, 13);
-            this.label16.TabIndex = 21;
-            this.label16.Text = "Datos:";
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(16, 285);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(58, 13);
+            this.label18.TabIndex = 25;
+            this.label18.Text = "Exportar a:";
             // 
             // FormPrincipal
             // 
@@ -514,6 +556,10 @@
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.TextBox txtNombreDatos;
         private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.TextBox txtNombreBD;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.TextBox txtRutaExportar;
+        private System.Windows.Forms.Label label18;
     }
 }
 

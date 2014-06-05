@@ -81,11 +81,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Plantillas\BOClass.html" />
+    <Content Include="Plantillas\Controller.html" />
     <Content Include="Plantillas\CreateUI.html" />
     <Content Include="Plantillas\DALClass.html" />
     <Content Include="Plantillas\EditUI.html" />
     <Content Include="Plantillas\ModelClass.html" />
     <Content Include="Plantillas\IndexUI.html" />
+    <Content Include="Plantillas\ProceduresGET.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

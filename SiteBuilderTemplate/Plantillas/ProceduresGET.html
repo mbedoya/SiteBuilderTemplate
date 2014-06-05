@@ -1,4 +1,4 @@
-﻿USE @@NombreClase;
+﻿USE @@NombreBD;
 
 DROP procedure IF EXISTS `Get@@Clases`;
 -- --------------------------------------------------------------------------------
@@ -8,13 +8,14 @@ DROP procedure IF EXISTS `Get@@Clases`;
 DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Get@@Clases`()
 BEGIN
-	SELECT
-		@@Campos
+	SELECT 	@@Campos
 	FROM 
         @@NombreClase;
 END$$
 
+DELIMITER ;
 
+USE @@NombreBD;
 DROP procedure IF EXISTS `Get@@ClaseByID`;
 -- --------------------------------------------------------------------------------
 -- Routine DDL
@@ -24,11 +25,51 @@ DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Get@@ClaseByID`(IN p@@Clave @@TipoDatoClave)
 BEGIN
 
-	SELECT
-		@@Campos
+	SELECT 	@@Campos
 	FROM 
         @@NombreClase
 	WHERE
 		ID = p@@Clave;
 
 END$$
+
+DELIMITER ;
+
+
+USE @@NombreBD;
+DROP procedure IF EXISTS `Create@@Clase`;
+    -- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
+DELIMITER $$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Create@@Clase`(@@ParametrosConTipo)
+BEGIN
+	
+	INSERT INTO @@NombreClase (@@CamposInsert) VALUES (@@ParametrosInsert);
+
+END$$
+
+DELIMITER ;
+
+USE @@NombreBD;
+DROP procedure IF EXISTS `Update@@Clase`;
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
+DELIMITER $$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Update@@Clase`(@@ParametrosConTipo)
+BEGIN
+
+	UPDATE
+	    @@NombreClase
+	SET 
+        @@SetParametros
+	WHERE ID = p@@Clave;
+
+END$$
+
+DELIMITER ;

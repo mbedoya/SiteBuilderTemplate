@@ -1,0 +1,47 @@
+﻿using @@Namespace.@@NombreNegocio;
+using @@Namespace.@@NombreModelo;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace WebSite.Controllers.Admin
+{
+    public class Manage@@ClaseController : Controller
+    {
+        //
+        // GET: /Manage@@Clase/
+
+        public ActionResult Index()
+        {
+            return View(@@ClaseNegocio.GetAll());
+        }
+
+        public ActionResult Edit(int id)
+        {
+            return View(@@ClaseNegocio.Get(id));
+        }
+
+        [HttpPost, ValidateInput(false)]
+        public ActionResult Edit(@@Modelo @@NombreClase)
+        {
+            @@ClaseNegocio.Update(@@NombreClase);
+
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost, ValidateInput(false)]
+        public ActionResult Create(@@Modelo @@NombreClase)
+        {
+            @@ClaseNegocio.Create(@@NombreClase);
+
+            return RedirectToAction("Index");
+        }
+    }
+}

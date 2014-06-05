@@ -17,7 +17,7 @@ namespace @@Namespace.@@NombreDatos
             List<@@Modelo> @@NombreClases = new List<@@Modelo>();
 
             MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
-            MySqlDataAdapter adapter = new MySqlDataAdapter(BusinessUtilies.Const.Database.Procedure_GetAllPages, connection);
+            MySqlDataAdapter adapter = new MySqlDataAdapter("Get@@Clases", connection);
             DataTable results = new DataTable();
 
             adapter.Fill(results);
@@ -38,7 +38,7 @@ namespace @@Namespace.@@NombreDatos
             @@Modelo @@NombreClase = null;
 
             MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
-            MySqlDataAdapter adapter = new MySqlDataAdapter(BusinessUtilies.Const.Database.Procedure_GetPage, connection);
+            MySqlDataAdapter adapter = new MySqlDataAdapter("Get@@ClaseByID", connection);
             MySqlParameter paramID = new MySqlParameter("pId", id);
             paramID.Direction = ParameterDirection.Input;
             adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
@@ -61,7 +61,7 @@ namespace @@Namespace.@@NombreDatos
         public static void Update(@@Modelo @@NombreClase)
         {
             MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
-            MySqlDataAdapter adapter = new MySqlDataAdapter(BusinessUtilies.Const.Database.Procedure_UpdatePage, connection);
+            MySqlDataAdapter adapter = new MySqlDataAdapter("Update@@Clase", connection);
             adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
 
             @@SetData
@@ -73,7 +73,7 @@ namespace @@Namespace.@@NombreDatos
         public static void Create(@@Modelo @@NombreClase)
         {
             MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
-            MySqlDataAdapter adapter = new MySqlDataAdapter(BusinessUtilies.Const.Database.Procedure_CreatePage, connection);                        
+            MySqlDataAdapter adapter = new MySqlDataAdapter("Create@@Clase", connection);                        
             adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
 
             @@SetData
