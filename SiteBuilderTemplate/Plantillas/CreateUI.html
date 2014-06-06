@@ -9,7 +9,7 @@
 
 <h2>Crear @@Nombre</h2>
 
-@using (Html.BeginForm()) {
+@using ( Html.BeginForm(null, null, FormMethod.Post ,new { enctype = "multipart/form-data" })) {
     @Html.ValidationSummary(true)
 
     <fieldset>
@@ -27,4 +27,19 @@
     @Html.ActionLink("Back to List", "Index")
 </div>
 
-@@Scripts
+@section scripts{ 
+
+    @Scripts.Render("~/Scripts/jquery.js")
+    @Scripts.Render("~/Scripts/ckeditor/ckeditor.js") 
+    @Scripts.Render("~/Scripts/jquery.fancybox.js")
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.fancybox').fancybox();
+        });
+    </script>
+}
+
+@section styles{ 
+    @Styles.Render("~/Content/css/jquery.fancybox.css")
+}

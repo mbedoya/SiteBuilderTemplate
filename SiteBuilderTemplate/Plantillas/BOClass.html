@@ -4,10 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Utilities;
 
 namespace @@Namespace.@@NombreNegocio
 {
-    public static class @@ClaseNegocio
+    public class Base@@ClaseNegocio
     {
         public static List<@@Modelo> GetAll()
         {
@@ -23,6 +24,8 @@ namespace @@Namespace.@@NombreNegocio
         {
             if (@@NombreClase.@@Clave > 0)
             {
+                @@SaveFiles
+
                 @@ClaseDatos.Update(@@NombreClase);
             }
             else
@@ -34,6 +37,8 @@ namespace @@Namespace.@@NombreNegocio
 
         public static void Create(@@Modelo @@NombreClase)
         {
+            @@SaveFiles
+
             @@ClaseDatos.Create(@@NombreClase);
         }
     }

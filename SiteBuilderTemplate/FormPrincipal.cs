@@ -9,11 +9,22 @@ using System.Windows.Forms;
 
 using MySql.Data.MySqlClient;
 using System.IO;
+using SiteBuilderTemplate.Clases;
 
 namespace SiteBuilderTemplate
 {
     public partial class FormPrincipal : Form
     {
+        Tabla tabla;
+
+        private enum Destino
+        {
+            MySql,
+            SqlServer,
+            Oracle,
+            Mongo
+        }
+
         public const string cadenaConexion = "Server=localhost;Database=felicis;Uid=root;Pwd=12345;";
         public const string rutaPlantillas = @"C:\Users\USUARIO\Documents\visual studio 2012\Projects\SiteBuilderTemplate\SiteBuilderTemplate\Plantillas\";
         public const string plantillaIndiceUI = "IndexUI.html";
@@ -63,19 +74,14 @@ namespace SiteBuilderTemplate
         }
 
         private void btnGenerar_Click(object sender, EventArgs e)
+        {   
+            EjecutarProceso(tabla, Destino.MySql);
+        }
+
+        private void EjecutarProceso(Tabla tabla,Destino destino)
         {
-            string nombreTabla = cboTablas.Text;
-
-            string consultaSchemas =
-                "SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, COLUMN_KEY " +
-                " FROM INFORMATION_SCHEMA.COLUMNS " +
-                " WHERE TABLE_SCHEMA ='" + cboSchemas.Text + "' " +
-                " AND TABLE_NAME ='" + nombreTabla + "' ";
-
-            MySqlConnection connection = new MySqlConnection(cadenaConexion);
-            MySqlDataAdapter adapter = new MySqlDataAdapter(consultaSchemas, connection);
-            DataTable results = new DataTable();
-            adapter.Fill(results);
+            List<Columna> columnas = tabla.Columnas;
+            string nombreTabla = tabla.Nombre;
 
             //Generar textos para plantillas
             string nombreNamespace = txtNamespace.Text;
@@ -83,8 +89,8 @@ namespace SiteBuilderTemplate
             string nombreDatos = txtNombreDatos.Text;
             string prefijoModelo = txtPrefijoModelo.Text;
             string prefijoDatos = txtPrefijoDatos.Text;
-            string prefijoNegocio = txtPrefijoNegocio.Text; 
-            string nombreModeloCompleto = nombreNamespace + "." + nombreModelo  + "." + Pascal(nombreTabla) + prefijoModelo;
+            string prefijoNegocio = txtPrefijoNegocio.Text;
+            string nombreModeloCompleto = nombreNamespace + "." + nombreModelo + "." + Pascal(nombreTabla) + prefijoModelo;
             string nombreNegocioAlias = txtNombre.Text;
             string nombreNegocio = txtNombreNegocio.Text;
             string nombrePrefijoNegocio = txtPrefijoNegocio.Text;
@@ -120,150 +126,177 @@ namespace SiteBuilderTemplate
             string textoParametrosInsert = "";
             string textoSetParametros = "";
             string textoPropiedades = "";
+            string textoPropiedadesArchivo = "";            
+            string textoCamposArchivo = "";
+            string textoHiddenArchivosEdit = "";
+            string textoSaveFiles = "";
             string clave = "";
             bool textAreaAdicionado = false;
 
-            foreach (DataRow item in results.Rows)
+            foreach (Columna item in columnas)
             {
                 bool clavePrimaria = false;
                 string tipoDatoCompleto = "";
 
-                if (item["CHARACTER_MAXIMUM_LENGTH"].GetType() != typeof(DBNull))
+                if (item.Tamano> 0)
                 {
-                    tipoDatoCompleto = item["DATA_TYPE"].ToString() + "(" + item["CHARACTER_MAXIMUM_LENGTH"].ToString() + ")";
+                    tipoDatoCompleto = item.Tipo + "(" + item.Tamano.ToString() + ")";
                 }
                 else
                 {
-                    tipoDatoCompleto = item["DATA_TYPE"].ToString();
+                    tipoDatoCompleto = item.Tipo;
                 }
 
-                if (item["COLUMN_KEY"].ToString().ToLower() == "pri")
+                if (item.Primaria)
                 {
-                    clave = item["COLUMN_NAME"].ToString();
+                    clave = item.Nombre;
                     tipoDatoClave = tipoDatoCompleto;
-                    
+
                     clavePrimaria = true;
                 }
 
                 //Campos SP
-                textoCamposSP += "\r\n\t\t" + item["COLUMN_NAME"].ToString() + ",";
-                textoParametros += " p" + item["COLUMN_NAME"].ToString() + ",";
-                textoParametrosConTipo += " p" + item["COLUMN_NAME"].ToString() + " " + tipoDatoCompleto + ",";
+                textoCamposSP += "\r\n\t\t" + item.Nombre + ",";
+                textoParametros += " p" + item.Nombre + ",";
+                textoParametrosConTipo += " p" + item.Nombre + " " + tipoDatoCompleto + ",";
+
+                //Archivo?
+                if (item.EsArchivo)
+                {
+                    //Parametros Archivo
+                    textoPropiedadesArchivo += "\r\n\t public HttpPostedFileBase file" + item.Nombre + " { get; set; }";
+
+                    textoCamposArchivo += "\r\n\t" + "<div class=\"editor-label\">" +
+                            "\r\n\t @Html.LabelFor(model => model." + item.Nombre + ")" +
+                            "\r\n\t" + "</div>" +
+                            "\r\n\t" + "<div class=\"editor-field-file\">" +
+                            "\r\n\t\t <input type='file' name=\"file" + item.Nombre + "\">" +
+                            "\r\n\t\t @if(Model != null) {  Html.RenderAction(\"FileDisplay\", \"Admin\", new { url = Model." + item.Nombre + " }); } " +
+                            "\r\n\t" + "</div>";
+
+                    textoSaveFiles +=
+                        "\r\n\t if (" + nombreTabla + ".file" + item.Nombre + " != null){" +
+                        "\r\n\t" + nombreTabla + "." + item.Nombre + "= FileManager.SaveFile(" + nombreTabla + ".file" + item.Nombre + ");" +
+                        "\r\n\t }";
+
+                    textoHiddenArchivosEdit += "\r\n\t @Html.HiddenFor(model => model." + item.Nombre + ")";
+                }
 
                 if (!clavePrimaria)
                 {
-                    textoCamposSPInsert += "\r\n\t\t" + item["COLUMN_NAME"].ToString() + ",";
-                    textoParametrosInsert += " p" + item["COLUMN_NAME"].ToString() + ",";
-                    textoSetParametros += item["COLUMN_NAME"].ToString() + " = p" + item["COLUMN_NAME"].ToString() + ",";
-                }
-
-                //Encabezado Indice UI
-                textoEncabezadoIndiceUI += "\r\n\t" + encabezadoIndice.Replace("@@", item["COLUMN_NAME"].ToString());
-
-                //Cuerpo Indice UI
-                if (item["CHARACTER_MAXIMUM_LENGTH"].GetType() != typeof(DBNull) &&
-                    Convert.ToInt32(item["CHARACTER_MAXIMUM_LENGTH"]) > maximoCaracteresTabla)
-                {
-                    textoCuerpoIndiceUI += "\r\n\t" + cuerpoIndice.Replace("@@", "@WebSite.WebUtilities.Misc.PreviewText(item." + item["COLUMN_NAME"].ToString() + "," + maximoCaracteresTabla.ToString() + ")");
-                }
-                else
-                {
-                    textoCuerpoIndiceUI += "\r\n\t" + cuerpoIndice.Replace("@@", "@item." + item["COLUMN_NAME"].ToString());
+                    textoCamposSPInsert += "\r\n\t\t" + item.Nombre + ",";
+                    textoParametrosInsert += " p" + item.Nombre + ",";
+                    textoSetParametros += item.Nombre + " = p" + item.Nombre + ",";
                 }
 
 
-                //Mapeo Datos
-                if (MapearTipoDato(item["DATA_TYPE"].ToString()) == "string")
+                if(item.MostrarEnIndice)
                 {
-                    textoCuerpoGetData += "\r\n\t " + nombreTabla + "." + item["COLUMN_NAME"].ToString() + " = Convert.ToString(item[\"" + item["COLUMN_NAME"].ToString() + "\"]);";
-                }
-                else
-                {
-                    if (MapearTipoDato(item["DATA_TYPE"].ToString()) == "int")
+                    //Encabezado Indice UI
+                    textoEncabezadoIndiceUI += "\r\n\t" + encabezadoIndice.Replace("@@", item.Nombre);
+
+                    //Cuerpo Indice UI
+                    if (item.Tamano > 0 && item.Tamano > maximoCaracteresTabla)
                     {
-                        textoCuerpoGetData += "\r\n\t " + nombreTabla + "." + item["COLUMN_NAME"].ToString() + " = Convert.ToInt32(item[\"" + item["COLUMN_NAME"].ToString() + "\"]);";
+                        textoCuerpoIndiceUI += "\r\n\t" + cuerpoIndice.Replace("@@", "@WebSite.WebUtilities.Misc.PreviewText(item." + item.Nombre + "," + maximoCaracteresTabla.ToString() + ")");
                     }
                     else
                     {
-                        if (MapearTipoDato(item["DATA_TYPE"].ToString()) == "DateTime")
+                        textoCuerpoIndiceUI += "\r\n\t" + cuerpoIndice.Replace("@@", "@item." + item.Nombre);
+                    }
+                }
+
+                //Mapeo Datos
+                if (MapearTipoDato(item.Tipo) == "string")
+                {
+                    textoCuerpoGetData += "\r\n\t " + nombreTabla + "." + item.Nombre + " = Convert.ToString(item[\"" + item.Nombre + "\"]);";
+                }
+                else
+                {
+                    if (MapearTipoDato(item.Tipo) == "int")
+                    {
+                        textoCuerpoGetData += "\r\n\t " + nombreTabla + "." + item.Nombre + " = Convert.ToInt32(item[\"" + item.Nombre + "\"]);";
+                    }
+                    else
+                    {
+                        if (MapearTipoDato(item.Tipo) == "DateTime")
                         {
-                            textoCuerpoGetData += "\r\n\t " + nombreTabla + "." + item["COLUMN_NAME"].ToString() + " = Convert.ToDateTime(item[\"" + item["COLUMN_NAME"].ToString() + "\"]);";
+                            textoCuerpoGetData += "\r\n\t " + nombreTabla + "." + item.Nombre + " = Convert.ToDateTime(item[\"" + item.Nombre + "\"]);";
                         }
                         else
                         {
-                            if (MapearTipoDato(item["DATA_TYPE"].ToString()) == "bool")
+                            if (MapearTipoDato(item.Tipo) == "bool")
                             {
-                                textoCuerpoGetData += "\r\n\t " + nombreTabla + "." + item["COLUMN_NAME"].ToString() + " = Convert.ToBoolean(item[\"" + item["COLUMN_NAME"].ToString() + "\"]);";
+                                textoCuerpoGetData += "\r\n\t " + nombreTabla + "." + item.Nombre + " = Convert.ToBoolean(item[\"" + item.Nombre + "\"]);";
                             }
                             else
                             {
-                                textoCuerpoGetData += "\r\n\t " + nombreTabla + "." + item["COLUMN_NAME"].ToString() + " = item[\"" + item["COLUMN_NAME"].ToString() + "\"];";
-                            }             
+                                textoCuerpoGetData += "\r\n\t " + nombreTabla + "." + item.Nombre + " = item[\"" + item.Nombre + "\"];";
+                            }
                         }
                     }
                 }
-                
-                //Set Data
-                textoCuerpoSetData += "\r\n\t " + "MySqlParameter param" + item["COLUMN_NAME"].ToString() + " = new MySqlParameter(\"p" + item["COLUMN_NAME"].ToString() +
-                    "\"," + nombreTabla + "." + item["COLUMN_NAME"].ToString() + ");";
-                textoCuerpoSetData += "\r\n\t " + "param" + item["COLUMN_NAME"].ToString() + ".Direction = ParameterDirection.Input;";
-                textoCuerpoSetData += "\r\n\t " + "adapter.SelectCommand.Parameters.Add(param" + item["COLUMN_NAME"].ToString() + ");";
 
-                //La clave primaria no se puede editar
-                if (!clavePrimaria)
+                //Set Data
+                textoCuerpoSetData += "\r\n\t " + "MySqlParameter param" + item.Nombre + " = new MySqlParameter(\"p" + item.Nombre +
+                    "\"," + nombreTabla + "." + item.Nombre + ");";
+                textoCuerpoSetData += "\r\n\t " + "param" + item.Nombre + ".Direction = ParameterDirection.Input;";
+                textoCuerpoSetData += "\r\n\t " + "adapter.SelectCommand.Parameters.Add(param" + item.Nombre + ");";
+
+                //La clave primaria no se puede editar, los archivos se muestran diferente
+                if (!clavePrimaria && !item.EsArchivo)
                 {
-                    if (item["CHARACTER_MAXIMUM_LENGTH"].GetType() != typeof(DBNull) &&
-                    Convert.ToInt32(item["CHARACTER_MAXIMUM_LENGTH"]) > caracteresTextArea)
+                    if (item.Tamano > 0 && item.Tamano > caracteresTextArea)
                     {
                         //Cuerpo Edit UI
                         textoCuerpoEditUI +=
                             "\r\n\t" + "<div class=\"editor-label\">" +
-                            "\r\n\t @Html.LabelFor(model => model." + item["COLUMN_NAME"].ToString() + ")" +
+                            "\r\n\t @Html.LabelFor(model => model." + item.Nombre + ")" +
                             "\r\n\t" + "</div>" +
                             "\r\n\t" + "<div class=\"editor-field\">" +
-                            "\r\n\t <textarea class=\"ckeditor\" name=\"" + item["COLUMN_NAME"].ToString() + "\" >@if(Model != null){ @Model." + item["COLUMN_NAME"].ToString() +"; }</textarea>" +
-                            "\r\n\t @Html.ValidationMessageFor(model => model." + item["COLUMN_NAME"].ToString() + ")" +
+                            "\r\n\t <textarea class=\"ckeditor\" name=\"" + item.Nombre + "\" >@if(Model != null){ @Model." + item.Nombre + "; }</textarea>" +
+                            "\r\n\t @Html.ValidationMessageFor(model => model." + item.Nombre + ")" +
                             "\r\n\t" + "</div>";
 
                         textAreaAdicionado = true;
                     }
                     else
-                    {
-                        if (item["CHARACTER_MAXIMUM_LENGTH"].GetType() != typeof(DBNull))
+                    {  
+
+                        if (item.Tamano > 0)
                         {
                             //Cuerpo Edit UI
                             textoCuerpoEditUI +=
                                 "\r\n\t" + "<div class=\"editor-label\">" +
-                                "\r\n\t @Html.LabelFor(model => model." + item["COLUMN_NAME"].ToString() + ")" +
+                                "\r\n\t @Html.LabelFor(model => model." + item.Nombre + ")" +
                                 "\r\n\t" + "</div>" +
                                 "\r\n\t" + "<div class=\"editor-field\">" +
-                                "\r\n\t @Html.EditorFor(model => model." + item["COLUMN_NAME"].ToString() + ", new { maxLength = " + item["CHARACTER_MAXIMUM_LENGTH"].ToString() + " })" +
-                                "\r\n\t @Html.ValidationMessageFor(model => model." + item["COLUMN_NAME"].ToString() + ")" +
-                                "\r\n\t" + "</div>";                
+                                "\r\n\t @Html.EditorFor(model => model." + item.Nombre + ", new { maxLength = " + item.Tamano.ToString() + " })" +
+                                "\r\n\t @Html.ValidationMessageFor(model => model." + item.Nombre + ")" +
+                                "\r\n\t" + "</div>";
                         }
                         else
                         {
                             //Cuerpo Edit UI
                             textoCuerpoEditUI +=
                                 "\r\n\t" + "<div class=\"editor-label\">" +
-                                "\r\n\t @Html.LabelFor(model => model." + item["COLUMN_NAME"].ToString() + ")" +
+                                "\r\n\t @Html.LabelFor(model => model." + item.Nombre + ")" +
                                 "\r\n\t" + "</div>" +
                                 "\r\n\t" + "<div class=\"editor-field\">" +
-                                "\r\n\t @Html.EditorFor(model => model." + item["COLUMN_NAME"].ToString() + ", new { maxLength = 10})" +
-                                "\r\n\t @Html.ValidationMessageFor(model => model." + item["COLUMN_NAME"].ToString() + ")" +
-                                "\r\n\t" + "</div>";                
+                                "\r\n\t @Html.EditorFor(model => model." + item.Nombre + ", new { maxLength = 10})" +
+                                "\r\n\t @Html.ValidationMessageFor(model => model." + item.Nombre + ")" +
+                                "\r\n\t" + "</div>";
                         }
 
-                        
+
                     }
 
-                    
-                }                
+
+                }
 
                 //Propiedadaes Clase
-                textoPropiedades += "\r\n\t" + propiedadaesClase.Replace("@@",
-                    MapearTipoDato(item["DATA_TYPE"].ToString()) + " " + item["COLUMN_NAME"].ToString());
-                
+                textoPropiedades += "\r\n\t" + propiedadaesClase.Replace("@@", MapearTipoDato(item.Tipo) + " " + item.Nombre);
+
             }
 
             textoCamposSP = textoCamposSP.Substring(0, textoCamposSP.Length - 1);
@@ -271,7 +304,7 @@ namespace SiteBuilderTemplate
             textoCamposSPInsert = textoCamposSPInsert.Substring(0, textoCamposSPInsert.Length - 1);
             textoParametrosInsert = textoParametrosInsert.Substring(0, textoParametrosInsert.Length - 1);
             textoSetParametros = textoSetParametros.Substring(0, textoSetParametros.Length - 1);
-            textoParametrosConTipo = textoParametrosConTipo.Substring(0, textoParametrosConTipo.Length - 1);
+            textoParametrosConTipo = textoParametrosConTipo.Substring(0, textoParametrosConTipo.Length - 1);            
 
             txtCodigo.Text = "";
 
@@ -293,49 +326,36 @@ namespace SiteBuilderTemplate
                 .Replace("@@Clave", clave);
 
             txtCodigo.Text += "\r\n\r\n CREATE UI \r\n\r\n";
-
-            File.WriteAllText(directorioUI.FullName + "\\Create.cshtml", textoPlantillaCreateUI.Replace("@@Nombre", nombreNegocioAlias)
+            string textoCreateUI = textoPlantillaCreateUI.Replace("@@Nombre", nombreNegocioAlias)
                 .Replace("@@Modelo", nombreModeloCompleto)
                 .Replace("@@Layout", layout)
-                .Replace("@@Cuerpo", textoCuerpoEditUI)
-                .Replace("@@Clave", clave)
-                .Replace("@@Scripts", textAreaAdicionado ? "@section scripts{ @Scripts.Render(\"~/Scripts/ckeditor/ckeditor.js\") }" : ""));
-            txtCodigo.Text += "\r\n\r\n" + textoPlantillaCreateUI.Replace("@@Nombre", nombreNegocioAlias)
-                .Replace("@@Modelo", nombreModeloCompleto)
-                .Replace("@@Layout", layout)
-                .Replace("@@Cuerpo", textoCuerpoEditUI)
-                .Replace("@@Clave", clave)
-                .Replace("@@Scripts", textAreaAdicionado ? "@section scripts{ @Scripts.Render(\"~/Scripts/ckeditor/ckeditor.js\") }" : "");
+                .Replace("@@Cuerpo", textoCuerpoEditUI + textoCamposArchivo)
+                .Replace("@@Clave", clave);
+            File.WriteAllText(directorioUI.FullName + "\\Create.cshtml", textoCreateUI);
+            txtCodigo.Text += "\r\n\r\n" + textoCreateUI;
 
             txtCodigo.Text += "\r\n\r\n EDIT UI \r\n\r\n";
-
-            File.WriteAllText(directorioUI.FullName + "\\Edit.cshtml", textoPlantillaEditUI.Replace("@@Nombre", nombreNegocioAlias)
+            string textoEditUI = textoPlantillaEditUI.Replace("@@Nombre", nombreNegocioAlias)
                 .Replace("@@Modelo", nombreModeloCompleto)
                 .Replace("@@Layout", layout)
-                .Replace("@@Cuerpo", textoCuerpoEditUI)
-                .Replace("@@Clave", clave)
-                .Replace("@@Scripts", textAreaAdicionado ? "@section scripts{ @Scripts.Render(\"~/Scripts/ckeditor/ckeditor.js\") }" : ""));
-            txtCodigo.Text += "\r\n\r\n" + textoPlantillaEditUI.Replace("@@Nombre", nombreNegocioAlias)
-                .Replace("@@Modelo", nombreModeloCompleto)
-                .Replace("@@Layout", layout)                
-                .Replace("@@Cuerpo", textoCuerpoEditUI)
-                .Replace("@@Clave", clave)
-                .Replace("@@Scripts", textAreaAdicionado ? "@section scripts{ @Scripts.Render(\"~/Scripts/ckeditor/ckeditor.js\") }" : "");
-            
+                .Replace("@@Cuerpo", textoCuerpoEditUI + textoCamposArchivo + textoHiddenArchivosEdit)
+                .Replace("@@Clave", clave);
+            File.WriteAllText(directorioUI.FullName + "\\Edit.cshtml", textoEditUI);
+            txtCodigo.Text += "\r\n\r\n" + textoEditUI;
+
             txtCodigo.Text += "\r\n\r\n MODELO \r\n\r\n";
+            string textoModelo = textoPlantillaClase.Replace("@@Namespace", nombreNamespace + "." + nombreModelo)
+                .Replace("@@Clase", Pascal(nombreTabla) + txtPrefijoModelo.Text)
+                .Replace("@@Campos", textoPropiedades + textoPropiedadesArchivo);
 
             DirectoryInfo directorioModelo = Directory.CreateDirectory(rutaParaExportar + @"\" + Pascal(nombreTabla) + @"\BusinessManager\Models");
-            File.WriteAllText(directorioModelo.FullName + "\\" + Pascal(nombreTabla) + txtPrefijoModelo.Text + ".cs", textoPlantillaClase.Replace("@@Namespace", nombreNamespace + "." + nombreModelo)
-                .Replace("@@Clase", Pascal(nombreTabla) + txtPrefijoModelo.Text)
-                .Replace("@@Campos", textoPropiedades));
-            txtCodigo.Text += "\r\n\r\n" + textoPlantillaClase.Replace("@@Namespace", nombreNamespace + "." + nombreModelo)
-                .Replace("@@Clase", Pascal(nombreTabla) + txtPrefijoModelo.Text)
-                .Replace("@@Campos", textoPropiedades);
+            File.WriteAllText(directorioModelo.FullName + "\\" + Pascal(nombreTabla) + txtPrefijoModelo.Text + ".cs", textoModelo);
+            txtCodigo.Text += "\r\n\r\n" + textoModelo;
 
             txtCodigo.Text += "\r\n\r\n BO \r\n\r\n";
 
             DirectoryInfo directorioNegocio = Directory.CreateDirectory(rutaParaExportar + @"\" + Pascal(nombreTabla) + @"\BusinessManager\Business");
-            File.WriteAllText(directorioNegocio.FullName + "\\" + Pascal(nombreTabla) + prefijoNegocio + ".cs", textoPlantillaBO.Replace("@@Namespace", nombreNamespace)
+            string textoBO = textoPlantillaBO.Replace("@@Namespace", nombreNamespace)
                 .Replace("@@NombreModelo", nombreModelo)
                 .Replace("@@NombreNegocio", nombreNegocio)
                 .Replace("@@NombreDatos", nombreDatos)
@@ -343,21 +363,16 @@ namespace SiteBuilderTemplate
                 .Replace("@@Clave", clave)
                 .Replace("@@ClaseNegocio", Pascal(nombreTabla) + prefijoNegocio)
                 .Replace("@@Modelo", Pascal(nombreTabla) + prefijoModelo)
-                .Replace("@@ClaseDatos", Pascal(nombreTabla) + prefijoDatos));
-            txtCodigo.Text += "\r\n\r\n" + textoPlantillaBO.Replace("@@Namespace", nombreNamespace)
-                .Replace("@@NombreModelo", nombreModelo)
-                .Replace("@@NombreNegocio", nombreNegocio)
-                .Replace("@@NombreDatos", nombreDatos)
-                .Replace("@@NombreClase", nombreTabla)
-                .Replace("@@Clave", clave)
-                .Replace("@@ClaseNegocio", Pascal(nombreTabla) + prefijoNegocio)
-                .Replace("@@Modelo", Pascal(nombreTabla) + prefijoModelo)
-                .Replace("@@ClaseDatos", Pascal(nombreTabla) + prefijoDatos);
+                .Replace("@@ClaseDatos", Pascal(nombreTabla) + prefijoDatos)
+                .Replace("@@SaveFiles",textoSaveFiles);
+
+            File.WriteAllText(directorioNegocio.FullName + "\\Base" + Pascal(nombreTabla) + prefijoNegocio + ".cs", textoBO);
+            txtCodigo.Text += "\r\n\r\n" + textoBO;
 
             txtCodigo.Text += "\r\n\r\n DAL \r\n\r\n";
 
             DirectoryInfo directorioDatos = Directory.CreateDirectory(rutaParaExportar + @"\" + Pascal(nombreTabla) + @"\BusinessManager\Data");
-            File.WriteAllText(directorioDatos.FullName + "\\" + Pascal(nombreTabla) + prefijoDatos + ".cs", textoPlantillaDAL.Replace("@@Namespace", nombreNamespace)
+            string textoDAL = textoPlantillaDAL.Replace("@@Namespace", nombreNamespace)
                 .Replace("@@NombreModelo", nombreModelo)
                 .Replace("@@NombreDatos", nombreDatos)
                 .Replace("@@ClaseNegocio", Pascal(nombreTabla) + prefijoNegocio)
@@ -366,17 +381,10 @@ namespace SiteBuilderTemplate
                 .Replace("@@Clase", Pascal(nombreTabla))
                 .Replace("@@CuerpoMapeo", textoCuerpoGetData)
                 .Replace("@@Modelo", Pascal(nombreTabla) + prefijoModelo)
-                .Replace("@@SetData", textoCuerpoSetData));
-            txtCodigo.Text += "\r\n\r\n" + textoPlantillaDAL.Replace("@@Namespace", nombreNamespace)
-                .Replace("@@NombreModelo", nombreModelo)                
-                .Replace("@@NombreDatos", nombreDatos)
-                .Replace("@@ClaseNegocio", Pascal(nombreTabla) + prefijoNegocio)                
-                .Replace("@@NombreClase", nombreTabla)
-                .Replace("@@ClaseDatos", Pascal(nombreTabla) + prefijoDatos)
-                .Replace("@@Clase", Pascal(nombreTabla))                
-                .Replace("@@CuerpoMapeo", textoCuerpoGetData)
-                .Replace("@@Modelo", Pascal(nombreTabla) + prefijoModelo)
                 .Replace("@@SetData", textoCuerpoSetData);
+
+            File.WriteAllText(directorioDatos.FullName + "\\Base" + Pascal(nombreTabla) + prefijoDatos + ".cs", textoDAL);
+            txtCodigo.Text += "\r\n\r\n" + textoDAL;
 
 
             txtCodigo.Text += "\r\n\r\n SP GET \r\n\r\n";
@@ -393,7 +401,7 @@ namespace SiteBuilderTemplate
                 .Replace("@@SetParametros", textoSetParametros)
                 .Replace("@@Parametros", textoParametros)
                 .Replace("@@NombreBD", nombreBD));
-            txtCodigo.Text += "\r\n\r\n" + 
+            txtCodigo.Text += "\r\n\r\n" +
                 textoPlantillaSPGET.Replace("@@Clave", clave)
                 .Replace("@@CamposInsert", textoCamposSPInsert)
                 .Replace("@@ParametrosInsert", textoParametrosInsert)
@@ -410,20 +418,16 @@ namespace SiteBuilderTemplate
             txtCodigo.Text += "\r\n\r\n Controller \r\n\r\n";
 
             DirectoryInfo directorioControlador = Directory.CreateDirectory(rutaParaExportar + @"\" + Pascal(nombreTabla) + @"\WebSite\Controllers\Admin");
-            File.WriteAllText(directorioControlador.FullName + "\\Manage" + Pascal(nombreTabla) + "Controller.cs", textoPlantillaController.Replace("@@Namespace", nombreNamespace)
+            string textoController = textoPlantillaController.Replace("@@Namespace", nombreNamespace)
                 .Replace("@@NombreModelo", nombreModelo)
                 .Replace("@@NombreNegocio", nombreNegocio)
                 .Replace("@@ClaseNegocio", Pascal(nombreTabla) + prefijoNegocio)
                 .Replace("@@NombreClase", nombreTabla)
                 .Replace("@@Modelo", Pascal(nombreTabla) + prefijoModelo)
-                .Replace("@@Clase", Pascal(nombreTabla)));
-            txtCodigo.Text += "\r\n\r\n" + textoPlantillaController.Replace("@@Namespace", nombreNamespace)
-                .Replace("@@NombreModelo", nombreModelo)
-                .Replace("@@NombreNegocio", nombreNegocio)                
-                .Replace("@@ClaseNegocio", Pascal(nombreTabla) + prefijoNegocio)
-                .Replace("@@NombreClase", nombreTabla)
-                .Replace("@@Modelo", Pascal(nombreTabla) + prefijoModelo)                
                 .Replace("@@Clase", Pascal(nombreTabla));
+
+            File.WriteAllText(directorioControlador.FullName + "\\Manage" + Pascal(nombreTabla) + "Controller.cs", textoController);
+            txtCodigo.Text += "\r\n\r\n" + textoController;
         }
 
         private string Pascal(string texto)
@@ -464,6 +468,53 @@ namespace SiteBuilderTemplate
                     }
                 }
             }
+        }
+
+        private void cboTablas_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string nombreTabla = cboTablas.Text;
+
+            string consultaSchemas =
+                "SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, COLUMN_KEY, COLUMN_COMMENT " +
+                " FROM INFORMATION_SCHEMA.COLUMNS " +
+                " WHERE TABLE_SCHEMA ='" + cboSchemas.Text + "' " +
+                " AND TABLE_NAME ='" + nombreTabla + "' ";
+
+            MySqlConnection connection = new MySqlConnection(cadenaConexion);
+            MySqlDataAdapter adapter = new MySqlDataAdapter(consultaSchemas, connection);
+            DataTable results = new DataTable();
+            adapter.Fill(results);
+
+            tabla = new Tabla(); 
+            
+            tabla.Nombre = nombreTabla;
+            foreach (DataRow item in results.Rows)
+            {
+                tabla.AdicionarColumna(new Columna()
+                {
+                    Nombre = item["COLUMN_NAME"].ToString(),
+                    Tipo = item["DATA_TYPE"].ToString(),
+                    Tamano = item["CHARACTER_MAXIMUM_LENGTH"].GetType() != typeof(DBNull) ? Convert.ToInt32(item["CHARACTER_MAXIMUM_LENGTH"]) : 0,
+                    Primaria = item["COLUMN_KEY"].ToString().ToLower() == "pri",
+                    Observaciones = item["COLUMN_COMMENT"].ToString()
+                });
+            }
+
+            dgvColumnas.DataSource = tabla.Columnas;            
+            
+        }
+
+        private void dgvColumnas_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if(e.ColumnIndex == 1)
+            {
+                tabla.CambiarEstadoMostrarColumna(e.RowIndex);
+            }
+        }
+
+        private void dgvColumnas_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

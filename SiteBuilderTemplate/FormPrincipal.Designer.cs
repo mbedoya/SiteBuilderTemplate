@@ -30,6 +30,8 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.txtRutaExportar = new System.Windows.Forms.TextBox();
+            this.label18 = new System.Windows.Forms.Label();
             this.txtNombreBD = new System.Windows.Forms.TextBox();
             this.label17 = new System.Windows.Forms.Label();
             this.txtNombreDatos = new System.Windows.Forms.TextBox();
@@ -69,13 +71,13 @@
             this.label7 = new System.Windows.Forms.Label();
             this.txtCssEncabezado = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
-            this.txtRutaExportar = new System.Windows.Forms.TextBox();
-            this.label18 = new System.Windows.Forms.Label();
+            this.dgvColumnas = new System.Windows.Forms.DataGridView();
             this.groupBox1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvColumnas)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -89,6 +91,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.dgvColumnas);
             this.groupBox1.Controls.Add(this.txtRutaExportar);
             this.groupBox1.Controls.Add(this.label18);
             this.groupBox1.Controls.Add(this.txtNombreBD);
@@ -118,10 +121,27 @@
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(6, 20);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(564, 311);
+            this.groupBox1.Size = new System.Drawing.Size(564, 608);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Opciones";
+            // 
+            // txtRutaExportar
+            // 
+            this.txtRutaExportar.Location = new System.Drawing.Point(89, 282);
+            this.txtRutaExportar.Name = "txtRutaExportar";
+            this.txtRutaExportar.Size = new System.Drawing.Size(182, 20);
+            this.txtRutaExportar.TabIndex = 26;
+            this.txtRutaExportar.Text = "C:\\Plantillas";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(16, 285);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(58, 13);
+            this.label18.TabIndex = 25;
+            this.label18.Text = "Exportar a:";
             // 
             // txtNombreBD
             // 
@@ -313,7 +333,7 @@
             // 
             // btnGenerar
             // 
-            this.btnGenerar.Location = new System.Drawing.Point(468, 282);
+            this.btnGenerar.Location = new System.Drawing.Point(468, 579);
             this.btnGenerar.Name = "btnGenerar";
             this.btnGenerar.Size = new System.Drawing.Size(75, 23);
             this.btnGenerar.TabIndex = 2;
@@ -329,14 +349,15 @@
             this.cboTablas.Name = "cboTablas";
             this.cboTablas.Size = new System.Drawing.Size(182, 21);
             this.cboTablas.TabIndex = 1;
+            this.cboTablas.SelectedIndexChanged += new System.EventHandler(this.cboTablas_SelectedIndexChanged);
             // 
             // txtCodigo
             // 
-            this.txtCodigo.Location = new System.Drawing.Point(12, 381);
+            this.txtCodigo.Location = new System.Drawing.Point(16, 689);
             this.txtCodigo.Multiline = true;
             this.txtCodigo.Name = "txtCodigo";
             this.txtCodigo.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtCodigo.Size = new System.Drawing.Size(599, 229);
+            this.txtCodigo.Size = new System.Drawing.Size(599, 75);
             this.txtCodigo.TabIndex = 2;
             // 
             // tabControl1
@@ -346,7 +367,7 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(603, 363);
+            this.tabControl1.Size = new System.Drawing.Size(603, 671);
             this.tabControl1.TabIndex = 3;
             // 
             // tabPage1
@@ -355,7 +376,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(595, 337);
+            this.tabPage1.Size = new System.Drawing.Size(595, 645);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Básicas";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -475,28 +496,21 @@
             this.label10.TabIndex = 5;
             this.label10.Text = "CSS Encabezado:";
             // 
-            // txtRutaExportar
+            // dgvColumnas
             // 
-            this.txtRutaExportar.Location = new System.Drawing.Point(89, 282);
-            this.txtRutaExportar.Name = "txtRutaExportar";
-            this.txtRutaExportar.Size = new System.Drawing.Size(182, 20);
-            this.txtRutaExportar.TabIndex = 26;
-            this.txtRutaExportar.Text = "C:\\Plantillas";
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(16, 285);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(58, 13);
-            this.label18.TabIndex = 25;
-            this.label18.Text = "Exportar a:";
+            this.dgvColumnas.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvColumnas.Location = new System.Drawing.Point(19, 320);
+            this.dgvColumnas.Name = "dgvColumnas";
+            this.dgvColumnas.Size = new System.Drawing.Size(524, 253);
+            this.dgvColumnas.TabIndex = 27;
+            this.dgvColumnas.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvColumnas_CellContentClick);
+            this.dgvColumnas.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvColumnas_CellValueChanged);
             // 
             // FormPrincipal
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(628, 612);
+            this.ClientSize = new System.Drawing.Size(628, 776);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.txtCodigo);
             this.Name = "FormPrincipal";
@@ -510,6 +524,7 @@
             this.tabPage2.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvColumnas)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -560,6 +575,7 @@
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.TextBox txtRutaExportar;
         private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.DataGridView dgvColumnas;
     }
 }
 
