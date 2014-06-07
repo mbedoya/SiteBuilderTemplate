@@ -25,14 +25,16 @@ namespace SiteBuilderTemplate
             Mongo
         }
 
-        public const string cadenaConexion = "Server=localhost;Database=felicis;Uid=root;Pwd=12345;";
+        public const string cadenaConexion = "Server=localhost;Database=ecocore;Uid=root;Pwd=12345;";
         public const string rutaPlantillas = @"C:\Users\USUARIO\Documents\visual studio 2012\Projects\SiteBuilderTemplate\SiteBuilderTemplate\Plantillas\";
         public const string plantillaIndiceUI = "IndexUI.html";
         public const string plantillaEditUI = "EditUI.html";
         public const string plantillaCreateUI = "CreateUI.html";
         public const string plantillaClase = "ModelClass.html";
         public const string plantillaBO = "BOClass.html";
+        public const string plantillaBOConcreta = "ConcreteBOClass.html";
         public const string plantillaDAL = "DALClass.html";
+        public const string plantillaDALConcreto = "ConcreteDALClass.html";
         public const string plantillaSPGET = "ProceduresGET.html";
         public const string plantillaController = "Controller.html";
 
@@ -71,6 +73,8 @@ namespace SiteBuilderTemplate
             cboTablas.DisplayMember = "TABLE_NAME";
             cboTablas.ValueMember = "TABLE_NAME";
             cboTablas.DataSource = results;
+
+            txtNombreBD.Text = cboSchemas.Text;
         }
 
         private void btnGenerar_Click(object sender, EventArgs e)
@@ -101,7 +105,7 @@ namespace SiteBuilderTemplate
             int maximoCaracteresTabla = Convert.ToInt32(txtMaximoCaracteresTabla.Text);
             int caracteresTextArea = Convert.ToInt32(txtCarTextArea.Text);
             string nombreBD = txtNombreBD.Text;
-            string rutaParaExportar = txtRutaExportar.Text;
+            string rutaParaExportar = txtRutaExportar.Text + @"\" + cboSchemas.Text;
             string tipoDatoClave = "";
 
             //Generación de código de UI
@@ -110,7 +114,9 @@ namespace SiteBuilderTemplate
             string textoPlantillaClase = File.ReadAllText(rutaPlantillas + plantillaClase);
             string textoPlantillaCreateUI = File.ReadAllText(rutaPlantillas + plantillaCreateUI);
             string textoPlantillaBO = File.ReadAllText(rutaPlantillas + plantillaBO);
+            string textoPlantillaBOConcreta = File.ReadAllText(rutaPlantillas + plantillaBOConcreta);
             string textoPlantillaDAL = File.ReadAllText(rutaPlantillas + plantillaDAL);
+            string textoPlantillaDALConcreto = File.ReadAllText(rutaPlantillas + plantillaDALConcreto);
             string textoPlantillaSPGET = File.ReadAllText(rutaPlantillas + plantillaSPGET);
             string textoPlantillaController = File.ReadAllText(rutaPlantillas + plantillaController);
 
@@ -132,6 +138,8 @@ namespace SiteBuilderTemplate
             string textoSaveFiles = "";
             string clave = "";
             bool textAreaAdicionado = false;
+            string textoNegocioCreador = "";
+            string textoNegocioFechaCreacion = "";
 
             foreach (Columna item in columnas)
             {
@@ -161,26 +169,33 @@ namespace SiteBuilderTemplate
                 textoParametrosConTipo += " p" + item.Nombre + " " + tipoDatoCompleto + ",";
 
                 //Archivo?
-                if (item.EsArchivo)
+                if (item.EsArchivo || item.SoloLectura)
                 {
-                    //Parametros Archivo
-                    textoPropiedadesArchivo += "\r\n\t public HttpPostedFileBase file" + item.Nombre + " { get; set; }";
+                    if (item.EsArchivo)
+                    {
+                        //Parametros Archivo
+                        textoPropiedadesArchivo += "\r\n\t public HttpPostedFileBase file" + item.Nombre + " { get; set; }";
 
-                    textoCamposArchivo += "\r\n\t" + "<div class=\"editor-label\">" +
-                            "\r\n\t @Html.LabelFor(model => model." + item.Nombre + ")" +
-                            "\r\n\t" + "</div>" +
-                            "\r\n\t" + "<div class=\"editor-field-file\">" +
-                            "\r\n\t\t <input type='file' name=\"file" + item.Nombre + "\">" +
-                            "\r\n\t\t @if(Model != null) {  Html.RenderAction(\"FileDisplay\", \"Admin\", new { url = Model." + item.Nombre + " }); } " +
-                            "\r\n\t" + "</div>";
+                        textoCamposArchivo += "\r\n\t" + "<div class=\"editor-label\">" +
+                                "\r\n\t @Html.LabelFor(model => model." + item.Nombre + ")" +
+                                "\r\n\t" + "</div>" +
+                                "\r\n\t" + "<div class=\"editor-field-file\">" +
+                                "\r\n\t\t <input type='file' name=\"file" + item.Nombre + "\">" +
+                                "\r\n\t\t @if(Model != null) {  Html.RenderAction(\"FileDisplay\", \"Admin\", new { url = Model." + item.Nombre + " }); } " +
+                                "\r\n\t" + "</div>";
 
-                    textoSaveFiles +=
-                        "\r\n\t if (" + nombreTabla + ".file" + item.Nombre + " != null){" +
-                        "\r\n\t" + nombreTabla + "." + item.Nombre + "= FileManager.SaveFile(" + nombreTabla + ".file" + item.Nombre + ");" +
-                        "\r\n\t }";
+                        textoSaveFiles +=
+                            "\r\n\t if (" + nombreTabla + ".file" + item.Nombre + " != null){" +
+                            "\r\n\t string filePath = FileManager.SaveFile(" + nombreTabla + ".file" + item.Nombre + ");" +
+                            "\r\n\t if (!String.IsNullOrEmpty(filePath))" +
+                            "\r\n\t\t {" +
+                            "\r\n\t" + nombreTabla + "." + item.Nombre + " = filePath;" +
+                            "\r\n\t\t };" +
+                            "\r\n\t }";
+                    }                    
 
                     textoHiddenArchivosEdit += "\r\n\t @Html.HiddenFor(model => model." + item.Nombre + ")";
-                }
+                }            
 
                 if (!clavePrimaria)
                 {
@@ -206,36 +221,34 @@ namespace SiteBuilderTemplate
                     }
                 }
 
+
+                string tipoMapeo = "String";
                 //Mapeo Datos
-                if (MapearTipoDato(item.Tipo) == "string")
+                if (MapearTipoDato(item.Tipo) == "int")
                 {
-                    textoCuerpoGetData += "\r\n\t " + nombreTabla + "." + item.Nombre + " = Convert.ToString(item[\"" + item.Nombre + "\"]);";
+                    tipoMapeo = "Int32";
                 }
                 else
                 {
-                    if (MapearTipoDato(item.Tipo) == "int")
+                    if (MapearTipoDato(item.Tipo) == "DateTime")
                     {
-                        textoCuerpoGetData += "\r\n\t " + nombreTabla + "." + item.Nombre + " = Convert.ToInt32(item[\"" + item.Nombre + "\"]);";
+                        tipoMapeo = "DateTime";
                     }
                     else
                     {
-                        if (MapearTipoDato(item.Tipo) == "DateTime")
+                        if (MapearTipoDato(item.Tipo) == "bool")
                         {
-                            textoCuerpoGetData += "\r\n\t " + nombreTabla + "." + item.Nombre + " = Convert.ToDateTime(item[\"" + item.Nombre + "\"]);";
-                        }
-                        else
-                        {
-                            if (MapearTipoDato(item.Tipo) == "bool")
-                            {
-                                textoCuerpoGetData += "\r\n\t " + nombreTabla + "." + item.Nombre + " = Convert.ToBoolean(item[\"" + item.Nombre + "\"]);";
-                            }
-                            else
-                            {
-                                textoCuerpoGetData += "\r\n\t " + nombreTabla + "." + item.Nombre + " = item[\"" + item.Nombre + "\"];";
-                            }
+
+                            tipoMapeo = "Boolean";
                         }
                     }
                 }
+
+                textoCuerpoGetData += "\r\n\t if (item[\"" + item.Nombre + "\"].GetType() != typeof(DBNull))" +
+                                "\r\n\t {" +
+                                "\r\n\t " + nombreTabla + "." + item.Nombre + " = Convert.To" + tipoMapeo + "(item[\"" + item.Nombre + "\"]);" +
+                                "\r\n\t }";
+                
 
                 //Set Data
                 textoCuerpoSetData += "\r\n\t " + "MySqlParameter param" + item.Nombre + " = new MySqlParameter(\"p" + item.Nombre +
@@ -261,7 +274,12 @@ namespace SiteBuilderTemplate
                         textAreaAdicionado = true;
                     }
                     else
-                    {  
+                    {
+                        string metodoHTML = "Editor";
+                        if(item.SoloLectura)
+                        {
+                            metodoHTML = "Display";
+                        }
 
                         if (item.Tamano > 0)
                         {
@@ -271,7 +289,7 @@ namespace SiteBuilderTemplate
                                 "\r\n\t @Html.LabelFor(model => model." + item.Nombre + ")" +
                                 "\r\n\t" + "</div>" +
                                 "\r\n\t" + "<div class=\"editor-field\">" +
-                                "\r\n\t @Html.EditorFor(model => model." + item.Nombre + ", new { maxLength = " + item.Tamano.ToString() + " })" +
+                                "\r\n\t @Html." + metodoHTML +  "For(model => model." + item.Nombre + ", new { maxLength = " + item.Tamano.ToString() + " })" +
                                 "\r\n\t @Html.ValidationMessageFor(model => model." + item.Nombre + ")" +
                                 "\r\n\t" + "</div>";
                         }
@@ -283,7 +301,7 @@ namespace SiteBuilderTemplate
                                 "\r\n\t @Html.LabelFor(model => model." + item.Nombre + ")" +
                                 "\r\n\t" + "</div>" +
                                 "\r\n\t" + "<div class=\"editor-field\">" +
-                                "\r\n\t @Html.EditorFor(model => model." + item.Nombre + ", new { maxLength = 10})" +
+                                "\r\n\t @Html." + metodoHTML + "For(model => model." + item.Nombre + ", new { maxLength = 10})" +
                                 "\r\n\t @Html.ValidationMessageFor(model => model." + item.Nombre + ")" +
                                 "\r\n\t" + "</div>";
                         }
@@ -304,7 +322,21 @@ namespace SiteBuilderTemplate
             textoCamposSPInsert = textoCamposSPInsert.Substring(0, textoCamposSPInsert.Length - 1);
             textoParametrosInsert = textoParametrosInsert.Substring(0, textoParametrosInsert.Length - 1);
             textoSetParametros = textoSetParametros.Substring(0, textoSetParametros.Length - 1);
-            textoParametrosConTipo = textoParametrosConTipo.Substring(0, textoParametrosConTipo.Length - 1);            
+            textoParametrosConTipo = textoParametrosConTipo.Substring(0, textoParametrosConTipo.Length - 1);
+
+            if(tabla.TieneColumnaCreador)
+            {
+                textoNegocioCreador = "\r\n\t if (!SecurityManager.SesionStarted())" +
+                    "\r\n\t {" +
+                    "\r\n\t throw new Exception(\"Session not started\");" +
+                    "\r\n\t }" +
+                    "\r\n\t " + nombreTabla + ".CreatedBy = SecurityManager.GetLoggedUser()." + clave + ";";
+            }
+     
+            if(tabla.TieneColumnaFechaCreacion)
+            {
+                textoNegocioFechaCreacion = "\r\n\t " + nombreTabla + ".DateCreated = DateTime.Now;";
+            }
 
             txtCodigo.Text = "";
 
@@ -369,6 +401,21 @@ namespace SiteBuilderTemplate
             File.WriteAllText(directorioNegocio.FullName + "\\Base" + Pascal(nombreTabla) + prefijoNegocio + ".cs", textoBO);
             txtCodigo.Text += "\r\n\r\n" + textoBO;
 
+            DirectoryInfo directorioNegocioConcreto = Directory.CreateDirectory(rutaParaExportar + @"\" + Pascal(nombreTabla) + @"\BusinessManager\Business");
+            string textoBOConcreto = textoPlantillaBOConcreta.Replace("@@Namespace", nombreNamespace)
+                .Replace("@@NombreModelo", nombreModelo)
+                .Replace("@@NombreNegocio", nombreNegocio)
+                .Replace("@@NombreDatos", nombreDatos)
+                .Replace("@@NombreClase", nombreTabla)                
+                .Replace("@@ClaseNegocio", Pascal(nombreTabla) + prefijoNegocio)
+                .Replace("@@Modelo", Pascal(nombreTabla) + prefijoModelo)
+                .Replace("@@Creador", textoNegocioCreador)
+                .Replace("@@FechaCreacion", textoNegocioFechaCreacion);
+
+            File.WriteAllText(directorioNegocioConcreto.FullName + "\\_" + Pascal(nombreTabla) + prefijoNegocio + ".cs", textoBOConcreto);
+            txtCodigo.Text += "\r\n\r\n" + textoBOConcreto;
+
+
             txtCodigo.Text += "\r\n\r\n DAL \r\n\r\n";
 
             DirectoryInfo directorioDatos = Directory.CreateDirectory(rutaParaExportar + @"\" + Pascal(nombreTabla) + @"\BusinessManager\Data");
@@ -385,6 +432,13 @@ namespace SiteBuilderTemplate
 
             File.WriteAllText(directorioDatos.FullName + "\\Base" + Pascal(nombreTabla) + prefijoDatos + ".cs", textoDAL);
             txtCodigo.Text += "\r\n\r\n" + textoDAL;
+
+            string textoConcretoDAL = textoPlantillaDALConcreto.Replace("@@Namespace", nombreNamespace)                
+                .Replace("@@NombreDatos", nombreDatos)
+                .Replace("@@ClaseDatos", Pascal(nombreTabla) + prefijoDatos);
+
+            File.WriteAllText(directorioDatos.FullName + "\\" + Pascal(nombreTabla) + prefijoDatos + ".cs", textoConcretoDAL);
+            txtCodigo.Text += "\r\n\r\n" + textoConcretoDAL;
 
 
             txtCodigo.Text += "\r\n\r\n SP GET \r\n\r\n";
@@ -463,7 +517,7 @@ namespace SiteBuilderTemplate
                         }
                         else
                         {
-                            return "object";
+                            return "string";
                         }                        
                     }
                 }

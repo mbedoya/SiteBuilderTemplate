@@ -15,18 +15,18 @@ namespace WebSite.Controllers.Admin
 
         public ActionResult Index()
         {
-            return View(@@ClaseNegocio.GetAll());
+            return View(@@ClaseNegocio.GetInstance().GetAll());
         }
 
         public ActionResult Edit(int id)
         {
-            return View(@@ClaseNegocio.Get(id));
+            return View(@@ClaseNegocio.GetInstance().Get(id));
         }
 
         [HttpPost, ValidateInput(false)]
         public ActionResult Edit(@@Modelo @@NombreClase)
         {
-            @@ClaseNegocio.Update(@@NombreClase);
+            @@ClaseNegocio.GetInstance().Update(@@NombreClase);
 
             return RedirectToAction("Index");
         }
@@ -39,7 +39,7 @@ namespace WebSite.Controllers.Admin
         [HttpPost, ValidateInput(false)]
         public ActionResult Create(@@Modelo @@NombreClase)
         {
-            @@ClaseNegocio.Create(@@NombreClase);
+            @@ClaseNegocio.GetInstance().Create(@@NombreClase);
 
             return RedirectToAction("Index");
         }

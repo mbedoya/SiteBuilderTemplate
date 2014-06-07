@@ -83,7 +83,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Plantillas\BOClass.html" />
+    <Content Include="Plantillas\ConcreteDALClass.html" />
     <Content Include="Plantillas\Controller.html" />
+    <Content Include="Plantillas\ConcreteBOClass.html" />
     <Content Include="Plantillas\CreateUI.html" />
     <Content Include="Plantillas\DALClass.html" />
     <Content Include="Plantillas\EditUI.html" />

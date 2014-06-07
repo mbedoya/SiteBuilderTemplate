@@ -1,0 +1,35 @@
+﻿using @@Namespace.@@NombreDatos;
+using @@Namespace.@@NombreModelo;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Utilities;
+using Utilities.Security;
+
+namespace @@Namespace.@@NombreNegocio
+{
+    public class @@ClaseNegocio : Base@@ClaseNegocio
+    {
+        private static @@ClaseNegocio instance;
+
+        public static @@ClaseNegocio GetInstance()
+        {
+            if(instance == null)
+            {
+                instance = new @@ClaseNegocio();
+            }
+
+            return instance;
+        }
+
+        public override void Create(@@Modelo @@NombreClase)
+        {
+            @@Creador        
+            @@FechaCreacion
+
+            base.Create(@@NombreClase);
+        }
+        
+    }
+}

@@ -15,6 +15,18 @@ namespace SiteBuilderTemplate.Clases
             get { return tieneArchivos; }            
         }
 
+        private bool tieneColumnaCreador;
+        public bool TieneColumnaCreador
+        {
+            get { return tieneColumnaCreador; }            
+        }
+
+        private bool tieneColumnaFechaCreacion;
+        public bool TieneColumnaFechaCreacion
+        {
+            get { return tieneColumnaFechaCreacion; }            
+        }
+
         public Tabla()
         {
             Columnas = new List<Columna>();
@@ -26,6 +38,17 @@ namespace SiteBuilderTemplate.Clases
             {
                 tieneArchivos = true;
             }
+
+            if (columna.Nombre.ToLower() == "createdby")
+            {
+                tieneColumnaCreador = true;
+            }
+
+            if (columna.Nombre.ToLower() == "datecreated")
+            {
+                tieneColumnaFechaCreacion = true;
+            }
+
             Columnas.Add(columna);
         }
 

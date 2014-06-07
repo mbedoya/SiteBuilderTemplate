@@ -10,17 +10,17 @@ namespace @@Namespace.@@NombreNegocio
 {
     public class Base@@ClaseNegocio
     {
-        public static List<@@Modelo> GetAll()
+        public List<@@Modelo> GetAll()
         {
             return @@ClaseDatos.GetAll();
         }
 
-        public static @@Modelo Get(int id)
+        public @@Modelo Get(int id)
         {
             return @@ClaseDatos.Get(id);
         }
 
-        public static void Update(@@Modelo @@NombreClase)
+        public virtual void Update(@@Modelo @@NombreClase)
         {
             if (@@NombreClase.@@Clave > 0)
             {
@@ -35,7 +35,7 @@ namespace @@Namespace.@@NombreNegocio
             
         }
 
-        public static void Create(@@Modelo @@NombreClase)
+        public virtual void Create(@@Modelo @@NombreClase)
         {
             @@SaveFiles
 
