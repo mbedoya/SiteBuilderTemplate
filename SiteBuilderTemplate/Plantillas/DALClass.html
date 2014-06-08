@@ -81,5 +81,32 @@ namespace @@Namespace.@@NombreDatos
             DataTable results = new DataTable();
             adapter.Fill(results);
         }
+
+        public static List<@@Modelo> Get@@NombreForanea(int id)
+        {
+
+            List<@@Modelo> @@NombreClases = new List<@@Modelo>();
+
+            MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
+            MySqlDataAdapter adapter = new MySqlDataAdapter("GetBy@@NombreForaneaID", connection);
+            MySqlParameter paramID = new MySqlParameter("pId", id);
+            paramID.Direction = ParameterDirection.Input;
+            adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
+            adapter.SelectCommand.Parameters.Add(paramID);
+
+            DataTable results = new DataTable();
+
+            adapter.Fill(results);
+
+            foreach (DataRow item in results.Rows)
+            {
+                @@Modelo @@NombreClase = new @@Modelo();                
+                @@CuerpoMapeo
+
+                @@NombreClases.Add(@@NombreClase);                 
+            }            
+
+            return @@NombreClases;
+        }
     }
 }

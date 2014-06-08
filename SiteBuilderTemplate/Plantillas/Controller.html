@@ -13,9 +13,9 @@ namespace WebSite.Controllers.Admin
         //
         // GET: /Manage@@Clase/
 
-        public ActionResult Index()
+        public ActionResult Index(int id=0)
         {
-            return View(@@ClaseNegocio.GetInstance().GetAll());
+            return View(@@ClaseNegocio.GetInstance().GetAll(id));
         }
 
         public ActionResult Edit(int id)

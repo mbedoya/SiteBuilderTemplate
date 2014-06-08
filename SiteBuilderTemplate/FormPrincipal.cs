@@ -338,6 +338,27 @@ namespace SiteBuilderTemplate
                 textoNegocioFechaCreacion = "\r\n\t " + nombreTabla + ".DateCreated = DateTime.Now;";
             }
 
+            string textoGetAllBOConcreta = "";
+            if(tabla.TieneForaneaPrimaria)
+            {
+                textoGetAllBOConcreta = "\r\n\t public override List<" + Pascal(nombreTabla) + prefijoModelo + "> GetAll(int id)" +
+                    "\r\n\t {" +
+                    "\r\n\t if(id > 0)" +
+                    "\r\n\t {" +
+                    "\r\n\t  HttpContext.Current.Session[\"ParentID\"] = id;" +
+                    "\r\n\t return GetBy" + Pascal(tabla.NombreForaneaPrimaria) + "(id);" +
+                    "\r\n\t }else " +
+                    "\r\n\t { " +
+                    "\r\n\t HttpContext.Current.Session[\"ParentID\"] = null;" +
+                    "\r\n\t return base.GetAll(id);" +
+                    "\r\n\t }" +
+                    "\r\n\t }" +
+                    "\r\n\t public List<" + Pascal(nombreTabla) + prefijoModelo + "> GetBy" + Pascal(tabla.NombreForaneaPrimaria) + "(int id)" +
+                    "\r\n\t {" +
+                    "\r\n\t return " + Pascal(nombreTabla) + prefijoDatos + ".GetBy" + Pascal(tabla.NombreForaneaPrimaria) + "(id);" +
+                    "\r\n\t }";
+            }
+
             txtCodigo.Text = "";
 
             txtCodigo.Text += "INDICE UI \r\n\r\n";
@@ -410,7 +431,8 @@ namespace SiteBuilderTemplate
                 .Replace("@@ClaseNegocio", Pascal(nombreTabla) + prefijoNegocio)
                 .Replace("@@Modelo", Pascal(nombreTabla) + prefijoModelo)
                 .Replace("@@Creador", textoNegocioCreador)
-                .Replace("@@FechaCreacion", textoNegocioFechaCreacion);
+                .Replace("@@FechaCreacion", textoNegocioFechaCreacion)
+                .Replace("@@GetAll", textoGetAllBOConcreta);
 
             File.WriteAllText(directorioNegocioConcreto.FullName + "\\_" + Pascal(nombreTabla) + prefijoNegocio + ".cs", textoBOConcreto);
             txtCodigo.Text += "\r\n\r\n" + textoBOConcreto;
@@ -428,7 +450,8 @@ namespace SiteBuilderTemplate
                 .Replace("@@Clase", Pascal(nombreTabla))
                 .Replace("@@CuerpoMapeo", textoCuerpoGetData)
                 .Replace("@@Modelo", Pascal(nombreTabla) + prefijoModelo)
-                .Replace("@@SetData", textoCuerpoSetData);
+                .Replace("@@SetData", textoCuerpoSetData)
+                .Replace("@@NombreForanea", tabla.NombreForaneaPrimaria);
 
             File.WriteAllText(directorioDatos.FullName + "\\Base" + Pascal(nombreTabla) + prefijoDatos + ".cs", textoDAL);
             txtCodigo.Text += "\r\n\r\n" + textoDAL;
@@ -444,30 +467,23 @@ namespace SiteBuilderTemplate
             txtCodigo.Text += "\r\n\r\n SP GET \r\n\r\n";
 
             DirectoryInfo directorioSQL = Directory.CreateDirectory(rutaParaExportar + @"\" + Pascal(nombreTabla) + @"\SQL");
-            File.WriteAllText(directorioSQL.FullName + "\\ScriptProcedures.sql", textoPlantillaSPGET.Replace("@@Clave", clave)
-                .Replace("@@CamposInsert", textoCamposSPInsert)
-                .Replace("@@ParametrosInsert", textoParametrosInsert)
-                .Replace("@@TipoDatoClave", tipoDatoClave)
-                .Replace("@@NombreClase", nombreTabla)
-                .Replace("@@Clase", Pascal(nombreTabla))
-                .Replace("@@Campos", textoCamposSP)
-                .Replace("@@ParametrosConTipo", textoParametrosConTipo)
-                .Replace("@@SetParametros", textoSetParametros)
-                .Replace("@@Parametros", textoParametros)
-                .Replace("@@NombreBD", nombreBD));
-            txtCodigo.Text += "\r\n\r\n" +
-                textoPlantillaSPGET.Replace("@@Clave", clave)
-                .Replace("@@CamposInsert", textoCamposSPInsert)
-                .Replace("@@ParametrosInsert", textoParametrosInsert)
-                .Replace("@@TipoDatoClave", tipoDatoClave)
-                .Replace("@@NombreClase", nombreTabla)
-                .Replace("@@Clase", Pascal(nombreTabla))
-                .Replace("@@Campos", textoCamposSP)
-                .Replace("@@ParametrosConTipo", textoParametrosConTipo)
-                .Replace("@@SetParametros", textoSetParametros)
-                .Replace("@@Parametros", textoParametros)
-                .Replace("@@NombreBD", nombreBD);
 
+            string textoSQL = textoPlantillaSPGET.Replace("@@Clave", clave)
+                .Replace("@@CamposInsert", textoCamposSPInsert)
+                .Replace("@@ParametrosInsert", textoParametrosInsert)
+                .Replace("@@TipoDatoClave", tipoDatoClave)
+                .Replace("@@NombreClase", nombreTabla)
+                .Replace("@@Clase", Pascal(nombreTabla))
+                .Replace("@@Campos", textoCamposSP)
+                .Replace("@@ParametrosConTipo", textoParametrosConTipo)
+                .Replace("@@SetParametros", textoSetParametros)
+                .Replace("@@Parametros", textoParametros)
+                .Replace("@@NombreBD", nombreBD)
+                .Replace("@@NombreForanea", Pascal(tabla.NombreForaneaPrimaria))
+                .Replace("@@NombreOriginalForanea", tabla.NombreOriginalForanea);
+
+            File.WriteAllText(directorioSQL.FullName + "\\ScriptProcedures.sql", textoSQL);
+            txtCodigo.Text += "\r\n\r\n" + textoSQL;
 
             txtCodigo.Text += "\r\n\r\n Controller \r\n\r\n";
 
@@ -486,7 +502,15 @@ namespace SiteBuilderTemplate
 
         private string Pascal(string texto)
         {
-            return texto.Substring(0, 1).ToUpper() + texto.Substring(1, texto.Length - 1);
+            if (texto.Length > 0)
+            {
+                return texto.Substring(0, 1).ToUpper() + texto.Substring(1, texto.Length - 1);
+            }
+            else
+            {
+                return texto;
+            }
+            
         }
 
         private string MapearTipoDato(string tipoBD)
@@ -550,6 +574,7 @@ namespace SiteBuilderTemplate
                     Tipo = item["DATA_TYPE"].ToString(),
                     Tamano = item["CHARACTER_MAXIMUM_LENGTH"].GetType() != typeof(DBNull) ? Convert.ToInt32(item["CHARACTER_MAXIMUM_LENGTH"]) : 0,
                     Primaria = item["COLUMN_KEY"].ToString().ToLower() == "pri",
+                    Foranea = item["COLUMN_KEY"].ToString().ToLower() == "mul",
                     Observaciones = item["COLUMN_COMMENT"].ToString()
                 });
             }

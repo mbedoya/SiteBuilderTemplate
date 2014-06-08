@@ -43,7 +43,6 @@ namespace SiteBuilderTemplate.Clases
                 return Observaciones.ToLower().Contains("password");
             }
         }
-        
 
     }
 }

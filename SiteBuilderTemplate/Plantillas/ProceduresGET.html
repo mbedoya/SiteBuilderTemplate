@@ -29,7 +29,7 @@ BEGIN
 	FROM 
         @@NombreClase
 	WHERE
-		ID = p@@Clave;
+		@@Clave = p@@Clave;
 
 END$$
 
@@ -68,8 +68,27 @@ BEGIN
 	    @@NombreClase
 	SET 
         @@SetParametros
-	WHERE ID = p@@Clave;
+	WHERE @@Clave = p@@Clave;
 
+END$$
+
+DELIMITER ;
+
+USE @@NombreBD;
+
+DROP procedure IF EXISTS `Get@@ClaseBy@@NombreForaneaID`;
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Get@@ClaseBy@@NombreForaneaID`(IN pID int)
+BEGIN
+	SELECT 	@@Campos
+	FROM 
+        @@NombreClase
+    WHERE
+        @@NombreOriginalForanea = pID;
 END$$
 
 DELIMITER ;

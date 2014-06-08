@@ -27,6 +27,10 @@ namespace SiteBuilderTemplate.Clases
             get { return tieneColumnaFechaCreacion; }            
         }
 
+        public string NombreForaneaPrimaria { get; set; }
+        public string NombreOriginalForanea { get; set; }
+        public bool TieneForaneaPrimaria { get; set; }
+
         public Tabla()
         {
             Columnas = new List<Columna>();
@@ -47,6 +51,13 @@ namespace SiteBuilderTemplate.Clases
             if (columna.Nombre.ToLower() == "datecreated")
             {
                 tieneColumnaFechaCreacion = true;
+            }
+
+            if(columna.Foranea && columna.Observaciones.ToLower().Contains("foreign"))
+            {
+                TieneForaneaPrimaria = true;             
+                NombreForaneaPrimaria = columna.Observaciones.Split(',')[0];
+                NombreOriginalForanea = columna.Nombre;
             }
 
             Columnas.Add(columna);

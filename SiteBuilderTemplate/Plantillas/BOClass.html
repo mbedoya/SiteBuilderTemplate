@@ -5,17 +5,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Utilities;
+using System.Web;
 
 namespace @@Namespace.@@NombreNegocio
 {
     public class Base@@ClaseNegocio
     {
-        public List<@@Modelo> GetAll()
+        public virtual List<@@Modelo> GetAll(int id)
         {
             return @@ClaseDatos.GetAll();
         }
 
-        public @@Modelo Get(int id)
+        public virtual @@Modelo Get(int id)
         {
             return @@ClaseDatos.Get(id);
         }

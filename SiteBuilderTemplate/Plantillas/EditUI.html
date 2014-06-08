@@ -26,7 +26,14 @@
 }
 
 <div>
+    @if (Session["ParentID"] != null)
+    {
+    @Html.ActionLink("Back to List", "Index", new { id = Convert.ToInt32(Session["ParentID"]) })    
+    }
+    else
+    {
     @Html.ActionLink("Back to List", "Index")
+    }
 </div>
 
 @section scripts{ 
