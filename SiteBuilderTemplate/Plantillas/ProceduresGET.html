@@ -1,12 +1,12 @@
 ﻿USE @@NombreBD;
 
-DROP procedure IF EXISTS `Get@@Clases`;
+DROP procedure IF EXISTS `Core_Get@@Clases`;
 -- --------------------------------------------------------------------------------
 -- Routine DDL
 -- Note: comments before and after the routine body will not be stored by the server
 -- --------------------------------------------------------------------------------
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `Get@@Clases`()
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Core_Get@@Clases`()
 BEGIN
 	SELECT 	@@Campos
 	FROM 
@@ -16,13 +16,13 @@ END$$
 DELIMITER ;
 
 USE @@NombreBD;
-DROP procedure IF EXISTS `Get@@ClaseByID`;
+DROP procedure IF EXISTS `Core_Get@@ClaseByID`;
 -- --------------------------------------------------------------------------------
 -- Routine DDL
 -- Note: comments before and after the routine body will not be stored by the server
 -- --------------------------------------------------------------------------------
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `Get@@ClaseByID`(IN p@@Clave @@TipoDatoClave)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Core_Get@@ClaseByID`(IN p@@Clave @@TipoDatoClave)
 BEGIN
 
 	SELECT 	@@Campos
@@ -37,14 +37,14 @@ DELIMITER ;
 
 
 USE @@NombreBD;
-DROP procedure IF EXISTS `Create@@Clase`;
+DROP procedure IF EXISTS `Core_Create@@Clase`;
     -- --------------------------------------------------------------------------------
 -- Routine DDL
 -- Note: comments before and after the routine body will not be stored by the server
 -- --------------------------------------------------------------------------------
 DELIMITER $$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `Create@@Clase`(@@ParametrosConTipo)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Core_Create@@Clase`(@@ParametrosConTipo)
 BEGIN
 	
 	INSERT INTO @@NombreClase (@@CamposInsert) VALUES (@@ParametrosInsert);
@@ -54,14 +54,14 @@ END$$
 DELIMITER ;
 
 USE @@NombreBD;
-DROP procedure IF EXISTS `Update@@Clase`;
+DROP procedure IF EXISTS `Core_Update@@Clase`;
 -- --------------------------------------------------------------------------------
 -- Routine DDL
 -- Note: comments before and after the routine body will not be stored by the server
 -- --------------------------------------------------------------------------------
 DELIMITER $$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `Update@@Clase`(@@ParametrosConTipo)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Core_Update@@Clase`(@@ParametrosConTipo)
 BEGIN
 
 	UPDATE
@@ -76,13 +76,13 @@ DELIMITER ;
 
 USE @@NombreBD;
 
-DROP procedure IF EXISTS `Get@@ClaseBy@@NombreForaneaID`;
+DROP procedure IF EXISTS `Core_Get@@ClasesBy@@NombreForanea`;
 -- --------------------------------------------------------------------------------
 -- Routine DDL
 -- Note: comments before and after the routine body will not be stored by the server
 -- --------------------------------------------------------------------------------
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `Get@@ClaseBy@@NombreForaneaID`(IN pID int)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Core_Get@@ClasesBy@@NombreForanea`(IN pID int)
 BEGIN
 	SELECT 	@@Campos
 	FROM 
@@ -92,3 +92,43 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+USE @@NombreBD;
+DROP procedure IF EXISTS `Core_Delete@@Clase`;
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Core_Delete@@Clase`(IN pID int)
+BEGIN
+
+	DELETE		
+	FROM 
+        menu
+	WHERE
+		@@Clave = pID;
+
+END$$
+
+
+DELIMITER ;
+
+USE @@NombreBD;
+DROP procedure IF EXISTS `Core_Get@@Clase@@TablaHijaCount`;
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Core_Get@@Clase@@TablaHijaCount`(in pID int)
+BEGIN
+
+	SELECT 	
+		COUNT(1) as count
+	FROM 
+        @@TablaHija
+	WHERE
+		@@Clase@@Clave = pID;
+
+END$$

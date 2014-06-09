@@ -313,7 +313,14 @@ namespace SiteBuilderTemplate
                 }
 
                 //Propiedadaes Clase
-                textoPropiedades += "\r\n\t" + propiedadaesClase.Replace("@@", MapearTipoDato(item.Tipo) + " " + item.Nombre);
+                if (MapearTipoDato(item.Tipo) == "int")
+                {
+                    textoPropiedades += "\r\n\t" + propiedadaesClase.Replace("@@", MapearTipoDato(item.Tipo) + "? " + item.Nombre);
+                }
+                else 
+                {
+                    textoPropiedades += "\r\n\t" + propiedadaesClase.Replace("@@", MapearTipoDato(item.Tipo) + " " + item.Nombre);
+                }
 
             }
 
@@ -341,7 +348,7 @@ namespace SiteBuilderTemplate
             string textoGetAllBOConcreta = "";
             if(tabla.TieneForaneaPrimaria)
             {
-                textoGetAllBOConcreta = "\r\n\t public override List<" + Pascal(nombreTabla) + prefijoModelo + "> GetAll(int id)" +
+                textoGetAllBOConcreta = "\r\n\t public override List<" + Pascal(nombreTabla) + prefijoModelo + "> GetAll(int id=0)" +
                     "\r\n\t {" +
                     "\r\n\t if(id > 0)" +
                     "\r\n\t {" +
@@ -362,21 +369,28 @@ namespace SiteBuilderTemplate
             txtCodigo.Text = "";
 
             txtCodigo.Text += "INDICE UI \r\n\r\n";
+            string cuerpoIndiceUITablaHija = "";
+            string encabezadoIndiceUITablaHija = "";
+            if(!String.IsNullOrEmpty(tabla.NombreTablaHija)){
+                cuerpoIndiceUITablaHija = "\r\n\t " +
+                "\r\n\t <td> " +       
+                "\r\n\t @Html.Action(\"" + Pascal(tabla.NombreTablaHija) + "ChildrenField\", new { id = @item." + clave + " })" +
+                "\r\n\t </td>";
+
+                encabezadoIndiceUITablaHija = "\r\n\t <th class=\"top\">" + Pascal(tabla.NombreTablaHija) + "</th>";
+            }            
 
             DirectoryInfo directorioUI = Directory.CreateDirectory(rutaParaExportar + @"\" + Pascal(nombreTabla) + @"\WebSite\Views\Manage" + Pascal(nombreTabla));
+            string textoIndiceUI = textoPlantillaIndiceUI.Replace("@@NombreClase", Pascal(nombreTabla))
+                .Replace("@@Modelo", nombreModeloCompleto)
+                .Replace("@@Layout", layout)
+                .Replace("@@Encabezado", textoEncabezadoIndiceUI + encabezadoIndiceUITablaHija)
+                .Replace("@@Cuerpo", textoCuerpoIndiceUI + cuerpoIndiceUITablaHija)
+                .Replace("@@Clave", clave)
+                .Replace("@@Nombre", nombreNegocioAlias);
 
-            File.WriteAllText(directorioUI.FullName + "\\Index.cshtml", textoPlantillaIndiceUI.Replace("@@Nombre", nombreNegocioAlias)
-                .Replace("@@Modelo", nombreModeloCompleto)
-                .Replace("@@Layout", layout)
-                .Replace("@@Encabezado", textoEncabezadoIndiceUI)
-                .Replace("@@Cuerpo", textoCuerpoIndiceUI)
-                .Replace("@@Clave", clave));
-            txtCodigo.Text += textoPlantillaIndiceUI.Replace("@@Nombre", nombreNegocioAlias)
-                .Replace("@@Modelo", nombreModeloCompleto)
-                .Replace("@@Layout", layout)
-                .Replace("@@Encabezado", textoEncabezadoIndiceUI)
-                .Replace("@@Cuerpo", textoCuerpoIndiceUI)
-                .Replace("@@Clave", clave);
+            File.WriteAllText(directorioUI.FullName + "\\Index.cshtml", textoIndiceUI);
+            txtCodigo.Text += "\r\n\r\n" + textoIndiceUI; ;
 
             txtCodigo.Text += "\r\n\r\n CREATE UI \r\n\r\n";
             string textoCreateUI = textoPlantillaCreateUI.Replace("@@Nombre", nombreNegocioAlias)
@@ -417,7 +431,8 @@ namespace SiteBuilderTemplate
                 .Replace("@@ClaseNegocio", Pascal(nombreTabla) + prefijoNegocio)
                 .Replace("@@Modelo", Pascal(nombreTabla) + prefijoModelo)
                 .Replace("@@ClaseDatos", Pascal(nombreTabla) + prefijoDatos)
-                .Replace("@@SaveFiles",textoSaveFiles);
+                .Replace("@@SaveFiles",textoSaveFiles)
+                .Replace("@@TablaHija", Pascal(tabla.NombreTablaHija));
 
             File.WriteAllText(directorioNegocio.FullName + "\\Base" + Pascal(nombreTabla) + prefijoNegocio + ".cs", textoBO);
             txtCodigo.Text += "\r\n\r\n" + textoBO;
@@ -427,7 +442,8 @@ namespace SiteBuilderTemplate
                 .Replace("@@NombreModelo", nombreModelo)
                 .Replace("@@NombreNegocio", nombreNegocio)
                 .Replace("@@NombreDatos", nombreDatos)
-                .Replace("@@NombreClase", nombreTabla)                
+                .Replace("@@NombreClase", nombreTabla)
+                .Replace("@@NombreForanea", tabla.NombreOriginalForanea)
                 .Replace("@@ClaseNegocio", Pascal(nombreTabla) + prefijoNegocio)
                 .Replace("@@Modelo", Pascal(nombreTabla) + prefijoModelo)
                 .Replace("@@Creador", textoNegocioCreador)
@@ -451,7 +467,8 @@ namespace SiteBuilderTemplate
                 .Replace("@@CuerpoMapeo", textoCuerpoGetData)
                 .Replace("@@Modelo", Pascal(nombreTabla) + prefijoModelo)
                 .Replace("@@SetData", textoCuerpoSetData)
-                .Replace("@@NombreForanea", tabla.NombreForaneaPrimaria);
+                .Replace("@@NombreForanea", Pascal(tabla.NombreForaneaPrimaria))
+                .Replace("@@TablaHija", Pascal(tabla.NombreTablaHija));
 
             File.WriteAllText(directorioDatos.FullName + "\\Base" + Pascal(nombreTabla) + prefijoDatos + ".cs", textoDAL);
             txtCodigo.Text += "\r\n\r\n" + textoDAL;
@@ -480,7 +497,8 @@ namespace SiteBuilderTemplate
                 .Replace("@@Parametros", textoParametros)
                 .Replace("@@NombreBD", nombreBD)
                 .Replace("@@NombreForanea", Pascal(tabla.NombreForaneaPrimaria))
-                .Replace("@@NombreOriginalForanea", tabla.NombreOriginalForanea);
+                .Replace("@@NombreOriginalForanea", tabla.NombreOriginalForanea)
+                .Replace("@@TablaHija", Pascal(tabla.NombreTablaHija));
 
             File.WriteAllText(directorioSQL.FullName + "\\ScriptProcedures.sql", textoSQL);
             txtCodigo.Text += "\r\n\r\n" + textoSQL;
@@ -494,7 +512,8 @@ namespace SiteBuilderTemplate
                 .Replace("@@ClaseNegocio", Pascal(nombreTabla) + prefijoNegocio)
                 .Replace("@@NombreClase", nombreTabla)
                 .Replace("@@Modelo", Pascal(nombreTabla) + prefijoModelo)
-                .Replace("@@Clase", Pascal(nombreTabla));
+                .Replace("@@Clase", Pascal(nombreTabla))
+                .Replace("@@TablaHija", Pascal(tabla.NombreTablaHija));
 
             File.WriteAllText(directorioControlador.FullName + "\\Manage" + Pascal(nombreTabla) + "Controller.cs", textoController);
             txtCodigo.Text += "\r\n\r\n" + textoController;
@@ -502,7 +521,7 @@ namespace SiteBuilderTemplate
 
         private string Pascal(string texto)
         {
-            if (texto.Length > 0)
+            if (!String.IsNullOrEmpty(texto))
             {
                 return texto.Substring(0, 1).ToUpper() + texto.Substring(1, texto.Length - 1);
             }
@@ -563,7 +582,8 @@ namespace SiteBuilderTemplate
             DataTable results = new DataTable();
             adapter.Fill(results);
 
-            tabla = new Tabla(); 
+            tabla = new Tabla();
+            tabla.NombreTablaHija = GetChildTableName(cboSchemas.Text, nombreTabla);
             
             tabla.Nombre = nombreTabla;
             foreach (DataRow item in results.Rows)
@@ -595,5 +615,27 @@ namespace SiteBuilderTemplate
         {
 
         }
+
+        private string GetChildTableName(string schema, string table) 
+        {
+             string consultaSchemas =
+                "SELECT TABLE_NAME " +
+                " FROM INFORMATION_SCHEMA.COLUMNS " +
+                " WHERE TABLE_SCHEMA ='" + schema + "' " +
+                " AND COLUMN_COMMENT LIKE '%" + table + "%' ";
+
+            MySqlConnection connection = new MySqlConnection(cadenaConexion);
+            MySqlDataAdapter adapter = new MySqlDataAdapter(consultaSchemas, connection);
+            DataTable results = new DataTable();
+            adapter.Fill(results);
+
+            if(results.Rows.Count> 0)
+            {
+                return results.Rows[0]["TABLE_NAME"].ToString();
+            }else
+            {
+                return null;
+            }            
+        }        
     }
 }

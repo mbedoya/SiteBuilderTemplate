@@ -1,4 +1,6 @@
-﻿@model List<@@Modelo>
+﻿@using System.Web.Optimization
+
+@model List<@@Modelo>
 
 @{
     ViewBag.Title = "@@Nombre Index";
@@ -14,12 +16,18 @@
             @@Encabezado            
             <th class="top" scope="col"></th>
         </tr>
-        @foreach (var item in Model)
+        @if(Model != null)
         {
-            <tr>
-                @@Cuerpo                
-                <td>@Html.ActionLink("Edit", "Edit", new { id=item.@@Clave })</td>
-            </tr>
+            foreach (var item in Model)
+            {
+                <tr>
+                    @@Cuerpo                
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { id=item.@@Clave })
+                        <a class="deleteItem" item="@item.@@Clave" href="#">Delete</a>
+                    </td>
+                </tr>
+            }
         }
     </table>
     
@@ -29,3 +37,47 @@
 <div>
     @Html.ActionLink("Crear @@Nombre", "Create")
 </div>
+
+@section scripts{ 
+
+    @Scripts.Render("~/Scripts/jquery.js")
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $(".deleteItem").on("click", function () {
+
+                if (confirm("Are you sure you want to delete this @@Nombre?")) {
+
+                    var itemID = $(this).attr("item");
+
+                    //Check email and password
+                    $.ajax({
+                        url: "/Admin/Manage@@NombreClase/Delete",
+                        dataType: "json",
+                        type: "POST",
+                        data: { id: itemID },
+                        success: function (data) {
+
+                        },
+                        error: function (a, b, c) {
+                            alert("error deleting");
+                        }
+                    })
+                        .then(function (response) {
+
+                            if (response.success) {
+                                alert("Deleted");
+                                $("tr[id=" + itemID + "]").html('');
+                            }
+
+                        });
+                }
+
+            });
+        });
+
+    </script>
+    
+}

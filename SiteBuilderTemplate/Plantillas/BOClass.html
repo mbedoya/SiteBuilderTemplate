@@ -11,7 +11,7 @@ namespace @@Namespace.@@NombreNegocio
 {
     public class Base@@ClaseNegocio
     {
-        public virtual List<@@Modelo> GetAll(int id)
+        public virtual List<@@Modelo> GetAll(int id=0)
         {
             return @@ClaseDatos.GetAll();
         }
@@ -41,6 +41,16 @@ namespace @@Namespace.@@NombreNegocio
             @@SaveFiles
 
             @@ClaseDatos.Create(@@NombreClase);
+        }
+
+        public virtual void Delete(int id)
+        {
+            @@ClaseDatos.Delete(id);
+        }
+
+        public int Get@@TablaHijaCount(int @@NombreClaseID)
+        {
+            return @@ClaseDatos.Get@@TablaHijaCount(@@NombreClaseID);
         }
     }
 }

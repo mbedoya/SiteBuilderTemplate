@@ -31,6 +31,8 @@ namespace SiteBuilderTemplate.Clases
         public string NombreOriginalForanea { get; set; }
         public bool TieneForaneaPrimaria { get; set; }
 
+        public string NombreTablaHija { get; set; }
+
         public Tabla()
         {
             Columnas = new List<Columna>();

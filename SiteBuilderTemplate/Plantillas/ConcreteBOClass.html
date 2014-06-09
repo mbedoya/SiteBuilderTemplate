@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using Utilities;
 using Utilities.Security;
+using System.Web;
 
 namespace @@Namespace.@@NombreNegocio
 {
@@ -28,10 +29,25 @@ namespace @@Namespace.@@NombreNegocio
             @@Creador        
             @@FechaCreacion
 
+            if (HttpContext.Current.Session["ParentID"] != null)
+            {
+                @@NombreClase.@@NombreForanea = Convert.ToInt32(HttpContext.Current.Session["ParentID"]);
+            }
+
             base.Create(@@NombreClase);
-        }
+        }    
 
         @@GetAll
+
+        public override void Delete(int id)
+        {
+            if (!SecurityManager.SesionStarted() || SecurityManager.GetLoggedUser().Role != UserRole.Admin)
+            {
+                throw new Exception("Action not allowed");
+            }
+
+            base.Delete(id);
+        }
         
     }
 }

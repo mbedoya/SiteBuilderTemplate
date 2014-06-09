@@ -17,7 +17,7 @@ namespace @@Namespace.@@NombreDatos
             List<@@Modelo> @@NombreClases = new List<@@Modelo>();
 
             MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
-            MySqlDataAdapter adapter = new MySqlDataAdapter("Get@@Clases", connection);
+            MySqlDataAdapter adapter = new MySqlDataAdapter("Core_Get@@Clases", connection);
             DataTable results = new DataTable();
 
             adapter.Fill(results);
@@ -38,7 +38,7 @@ namespace @@Namespace.@@NombreDatos
             @@Modelo @@NombreClase = null;
 
             MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
-            MySqlDataAdapter adapter = new MySqlDataAdapter("Get@@ClaseByID", connection);
+            MySqlDataAdapter adapter = new MySqlDataAdapter("Core_Get@@ClaseByID", connection);
             MySqlParameter paramID = new MySqlParameter("pId", id);
             paramID.Direction = ParameterDirection.Input;
             adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
@@ -61,7 +61,7 @@ namespace @@Namespace.@@NombreDatos
         public static void Update(@@Modelo @@NombreClase)
         {
             MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
-            MySqlDataAdapter adapter = new MySqlDataAdapter("Update@@Clase", connection);
+            MySqlDataAdapter adapter = new MySqlDataAdapter("Core_Update@@Clase", connection);
             adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
 
             @@SetData
@@ -73,7 +73,7 @@ namespace @@Namespace.@@NombreDatos
         public static void Create(@@Modelo @@NombreClase)
         {
             MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
-            MySqlDataAdapter adapter = new MySqlDataAdapter("Create@@Clase", connection);                        
+            MySqlDataAdapter adapter = new MySqlDataAdapter("Core_Create@@Clase", connection);                        
             adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
 
             @@SetData
@@ -88,7 +88,7 @@ namespace @@Namespace.@@NombreDatos
             List<@@Modelo> @@NombreClases = new List<@@Modelo>();
 
             MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
-            MySqlDataAdapter adapter = new MySqlDataAdapter("GetBy@@NombreForaneaID", connection);
+            MySqlDataAdapter adapter = new MySqlDataAdapter("Core_GetBy@@NombreForaneaID", connection);
             MySqlParameter paramID = new MySqlParameter("pId", id);
             paramID.Direction = ParameterDirection.Input;
             adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
@@ -107,6 +107,76 @@ namespace @@Namespace.@@NombreDatos
             }            
 
             return @@NombreClases;
+        }
+
+        public static List<@@Modelo> GetBy@@NombreForanea(int id)
+        {
+            List<@@Modelo> @@NombreClases = new List<@@Modelo>();
+
+            MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
+            MySqlDataAdapter adapter = new MySqlDataAdapter("Core_Get@@ClasesBy@@NombreForanea", connection);
+
+            MySqlParameter paramID = new MySqlParameter("pID", id);
+            paramID.Direction = ParameterDirection.Input;        
+            adapter.SelectCommand.Parameters.Add(paramID);
+
+            adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
+            DataTable results = new DataTable();
+
+            adapter.Fill(results);
+
+            foreach (DataRow item in results.Rows)
+            {
+                @@Modelo @@NombreClase = new @@Modelo();                
+                @@CuerpoMapeo
+
+                @@NombreClases.Add(@@NombreClase);                 
+            }            
+
+            return @@NombreClases;
+        }
+
+        public static int Get@@TablaHijaCount(int id)
+        {
+            int count = 0;
+
+            MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
+            MySqlDataAdapter adapter = new MySqlDataAdapter("Core_Get@@Clase@@TablaHijaCount", connection);
+            MySqlParameter paramID = new MySqlParameter("pId", id);
+            paramID.Direction = ParameterDirection.Input;
+            adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
+            adapter.SelectCommand.Parameters.Add(paramID);
+
+            DataTable results = new DataTable();
+
+            adapter.Fill(results);
+
+            if (results.Rows.Count > 0)
+            {
+                DataRow item = results.Rows[0];                
+
+                if (item["count"].GetType() != typeof(DBNull))
+                {
+                    count = Convert.ToInt32(item["count"]);
+                }                
+            }
+
+            return count;       
+        }
+
+        public static void Delete(int id)
+        {
+            MySqlConnection connection = new MySqlConnection(ConfigurationManager.AppSettings[BusinessUtilies.Const.Database.AppSetting]);
+            MySqlDataAdapter adapter = new MySqlDataAdapter("Core_Delete@@Clase", connection);
+            adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
+
+
+            MySqlParameter paramID = new MySqlParameter("pID", id);
+            paramID.Direction = ParameterDirection.Input;
+            adapter.SelectCommand.Parameters.Add(paramID);            
+
+            DataTable results = new DataTable();
+            adapter.Fill(results);
         }
     }
 }
