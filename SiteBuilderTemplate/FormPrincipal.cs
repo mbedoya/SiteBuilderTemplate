@@ -295,7 +295,15 @@ namespace SiteBuilderTemplate
                         }
                         else
                         {
-                            //Cuerpo Edit UI
+                            if(item.Foranea && !String.IsNullOrEmpty(item.NombreTablaPrimaria))
+                            {
+                                //Cuerpo Edit UI
+                            textoCuerpoEditUI +=
+                                "\r\n\t @{ Html.RenderAction(\"ForeignKeyDisplay\", \"Admin\", new { fieldName = \""+ item.Nombre + "\", fieldValue = @Model." + item.Nombre + ", primaryTable = \"" + Pascal(item.NombreTablaPrimaria) + "\", readOnly = " + item.SoloLectura.ToString() + " }); }";	 
+
+                            }else
+                            {
+                                //Cuerpo Edit UI
                             textoCuerpoEditUI +=
                                 "\r\n\t" + "<div class=\"editor-label\">" +
                                 "\r\n\t @Html.LabelFor(model => model." + item.Nombre + ")" +
@@ -304,6 +312,8 @@ namespace SiteBuilderTemplate
                                 "\r\n\t @Html." + metodoHTML + "For(model => model." + item.Nombre + ", new { maxLength = 10})" +
                                 "\r\n\t @Html.ValidationMessageFor(model => model." + item.Nombre + ")" +
                                 "\r\n\t" + "</div>";
+                            }
+
                         }
 
 
@@ -636,6 +646,8 @@ namespace SiteBuilderTemplate
             {
                 return null;
             }            
-        }        
+        }
+
+
     }
 }

@@ -55,11 +55,27 @@ namespace SiteBuilderTemplate.Clases
                 tieneColumnaFechaCreacion = true;
             }
 
-            if(columna.Foranea && columna.Observaciones.ToLower().Contains("foreign"))
+            if (columna.Foranea && columna.Observaciones.ToLower().Contains("foreign"))
             {
-                TieneForaneaPrimaria = true;             
+                TieneForaneaPrimaria = true;
                 NombreForaneaPrimaria = columna.Observaciones.Split(',')[0];
+                columna.NombreTablaPrimaria = columna.Observaciones.Split(',')[0];
                 NombreOriginalForanea = columna.Nombre;
+            }
+            else
+            {
+                if (columna.Foranea)
+                {
+                    if (columna.Observaciones.Contains(","))
+                    {
+                        columna.NombreTablaPrimaria = columna.Observaciones.Split(',')[0];
+                    }
+                    else
+                    {
+                        columna.NombreTablaPrimaria = columna.Observaciones;
+                    }
+                    
+                }
             }
 
             Columnas.Add(columna);

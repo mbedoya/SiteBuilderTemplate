@@ -44,5 +44,7 @@ namespace SiteBuilderTemplate.Clases
             }
         }
 
+        public string NombreTablaPrimaria { get; set; }
+
     }
 }
