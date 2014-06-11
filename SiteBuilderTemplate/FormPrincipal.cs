@@ -299,7 +299,7 @@ namespace SiteBuilderTemplate
                             {
                                 //Cuerpo Edit UI
                             textoCuerpoEditUI +=
-                                "\r\n\t @{ Html.RenderAction(\"ForeignKeyDisplay\", \"Admin\", new { fieldName = \""+ item.Nombre + "\", fieldValue = @Model." + item.Nombre + ", primaryTable = \"" + Pascal(item.NombreTablaPrimaria) + "\", readOnly = " + item.SoloLectura.ToString() + " }); }";	 
+                                "\r\n\t @{ Html.RenderAction(\"ForeignKeyDisplay\", \"Admin\", new { fieldName = \""+ item.Nombre + "\", fieldValue = @Model != null ? @Model." + item.Nombre + " : 0, primaryTable = \"" + Pascal(item.NombreTablaPrimaria) + "\", readOnly = " + item.SoloLectura.ToString().ToLower() + " }); }";	 
 
                             }else
                             {
@@ -362,11 +362,11 @@ namespace SiteBuilderTemplate
                     "\r\n\t {" +
                     "\r\n\t if(id > 0)" +
                     "\r\n\t {" +
-                    "\r\n\t  HttpContext.Current.Session[\"ParentID\"] = id;" +
+                    "\r\n\t  HttpContext.Current.Session[\"" + nombreTabla + "ParentID\"] = id;" +
                     "\r\n\t return GetBy" + Pascal(tabla.NombreForaneaPrimaria) + "(id);" +
                     "\r\n\t }else " +
                     "\r\n\t { " +
-                    "\r\n\t HttpContext.Current.Session[\"ParentID\"] = null;" +
+                    "\r\n\t HttpContext.Current.Session[\"" + nombreTabla + "ParentID\"] = null;" +
                     "\r\n\t return base.GetAll(id);" +
                     "\r\n\t }" +
                     "\r\n\t }" +
@@ -403,7 +403,9 @@ namespace SiteBuilderTemplate
             txtCodigo.Text += "\r\n\r\n" + textoIndiceUI; ;
 
             txtCodigo.Text += "\r\n\r\n CREATE UI \r\n\r\n";
-            string textoCreateUI = textoPlantillaCreateUI.Replace("@@Nombre", nombreNegocioAlias)
+            string textoCreateUI = textoPlantillaCreateUI
+                .Replace("@@NombreClase", nombreTabla)
+                .Replace("@@Nombre", nombreNegocioAlias)                
                 .Replace("@@Modelo", nombreModeloCompleto)
                 .Replace("@@Layout", layout)
                 .Replace("@@Cuerpo", textoCuerpoEditUI + textoCamposArchivo)
@@ -412,7 +414,9 @@ namespace SiteBuilderTemplate
             txtCodigo.Text += "\r\n\r\n" + textoCreateUI;
 
             txtCodigo.Text += "\r\n\r\n EDIT UI \r\n\r\n";
-            string textoEditUI = textoPlantillaEditUI.Replace("@@Nombre", nombreNegocioAlias)
+            string textoEditUI = textoPlantillaEditUI
+                .Replace("@@NombreClase", nombreTabla)
+                .Replace("@@Nombre", nombreNegocioAlias)                
                 .Replace("@@Modelo", nombreModeloCompleto)
                 .Replace("@@Layout", layout)
                 .Replace("@@Cuerpo", textoCuerpoEditUI + textoCamposArchivo + textoHiddenArchivosEdit)
@@ -487,7 +491,7 @@ namespace SiteBuilderTemplate
                 .Replace("@@NombreDatos", nombreDatos)
                 .Replace("@@ClaseDatos", Pascal(nombreTabla) + prefijoDatos);
 
-            File.WriteAllText(directorioDatos.FullName + "\\" + Pascal(nombreTabla) + prefijoDatos + ".cs", textoConcretoDAL);
+            File.WriteAllText(directorioDatos.FullName + "\\_" + Pascal(nombreTabla) + prefijoDatos + ".cs", textoConcretoDAL);
             txtCodigo.Text += "\r\n\r\n" + textoConcretoDAL;
 
 

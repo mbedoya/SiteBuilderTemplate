@@ -29,9 +29,9 @@ namespace @@Namespace.@@NombreNegocio
             @@Creador        
             @@FechaCreacion
 
-            if (HttpContext.Current.Session["ParentID"] != null)
+            if (HttpContext.Current.Session["@@NombreClaseParentID"] != null)
             {
-                @@NombreClase.@@NombreForanea = Convert.ToInt32(HttpContext.Current.Session["ParentID"]);
+                @@NombreClase.@@NombreForanea = Convert.ToInt32(HttpContext.Current.Session["@@NombreClaseParentID"]);
             }
 
             base.Create(@@NombreClase);

@@ -29,9 +29,9 @@ namespace WebSite.Controllers.Admin
         {
             @@ClaseNegocio.GetInstance().Update(@@NombreClase);
 
-            if (Session["ParentID"] != null)
+            if (Session["@@NombreClaseParentID"] != null)
             {
-                return RedirectToAction("Index", new { id = Convert.ToInt32(Session["ParentID"]) });
+                return RedirectToAction("Index", new { id = Convert.ToInt32(Session["@@NombreClaseParentID"]) });
             }
             else
             {
@@ -49,9 +49,9 @@ namespace WebSite.Controllers.Admin
         {
             @@ClaseNegocio.GetInstance().Create(@@NombreClase);
 
-            if (Session["ParentID"] != null)
+            if (Session["@@NombreClaseParentID"] != null)
             {
-                return RedirectToAction("Index", new { id = Convert.ToInt32(Session["ParentID"]) });
+                return RedirectToAction("Index", new { id = Convert.ToInt32(Session["@@NombreClaseParentID"]) });
             }
             else
             {

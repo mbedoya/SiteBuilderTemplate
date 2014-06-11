@@ -26,9 +26,9 @@
 }
 
 <div>
-    @if (Session["ParentID"] != null)
+    @if (Session["@@NombreClaseParentID"] != null)
     {
-    @Html.ActionLink("Back to List", "Index", new { id = Convert.ToInt32(Session["ParentID"]) })    
+    @Html.ActionLink("Back to List", "Index", new { id = Convert.ToInt32(Session["@@NombreClaseParentID"]) })    
     }
     else
     {
